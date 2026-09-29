@@ -1,5 +1,6 @@
 import { getUser } from './storage.js';
 import { EXAM_MODULES, EXAM_QUESTIONS, CHEATSHEET } from './exam-data.js';
+import { WRITING_TASKS, gradeWriting } from './writing-grader.js';
 
 // App state
 let currentModuleId = null;
@@ -8,6 +9,13 @@ let quizQuestions = [];
 let currentIndex = 0;
 let userAnswers = []; // { question, userInput, isCorrect }
 let hasAnsweredCurrent = false;
+
+// Writing Lab state
+let currentWritingTask = 'cv';
+let writingDrafts = {
+  'cv': '',
+  'cover-letter': ''
+};
 
 function init() {
   const user = getUser();
@@ -92,6 +100,7 @@ function startQuiz(moduleId, isMock = false) {
   // Switch Views
   document.getElementById('view-selector').classList.add('hidden');
   document.getElementById('view-results').classList.add('hidden');
+  document.getElementById('view-writing')?.classList.add('hidden');
   document.getElementById('view-quiz').classList.remove('hidden');
 
   const badge = document.getElementById('quiz-module-badge');
@@ -722,9 +731,426 @@ function closeCheatsheet() {
 }
 
 // ============================================================================
+// VIEW 4: WRITING LAB / EXPRESSION ÉCRITE
+// ============================================================================
+function openWritingLab(taskType = 'cv') {
+  document.getElementById('view-selector').classList.add('hidden');
+  document.getElementById('view-quiz').classList.add('hidden');
+  document.getElementById('view-results').classList.add('hidden');
+  
+  const viewWriting = document.getElementById('view-writing');
+  if (viewWriting) viewWriting.classList.remove('hidden');
+
+  switchWritingTask(taskType);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function quitWritingLab() {
+  const textarea = document.getElementById('writing-textarea');
+  if (textarea && textarea.value.trim().length > 30) {
+    if (!confirm('Voulez-vous quitter l\'atelier d\'expression écrite ? Votre brouillon est conservé.')) {
+      return;
+    }
+  }
+  if (textarea) {
+    writingDrafts[currentWritingTask] = textarea.value;
+  }
+  
+  document.getElementById('view-writing').classList.add('hidden');
+  document.getElementById('view-selector').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchWritingTask(taskType) {
+  const textarea = document.getElementById('writing-textarea');
+  if (textarea && currentWritingTask) {
+    writingDrafts[currentWritingTask] = textarea.value;
+  }
+
+  currentWritingTask = taskType;
+  const task = WRITING_TASKS[taskType];
+  if (!task) return;
+
+  // Tabs
+  const tabCv = document.getElementById('tab-write-cv');
+  const tabCl = document.getElementById('tab-write-cl');
+  if (tabCv) tabCv.classList.toggle('active', taskType === 'cv');
+  if (tabCl) tabCl.classList.toggle('active', taskType === 'cover-letter');
+
+  // Task details
+  const iconEl = document.getElementById('writing-task-icon');
+  if (iconEl) iconEl.textContent = task.icon;
+
+  const titleEl = document.getElementById('writing-task-title');
+  if (titleEl) titleEl.textContent = task.title;
+
+  const badgeEl = document.getElementById('writing-task-badge');
+  if (badgeEl) badgeEl.textContent = task.badge;
+
+  const lengthEl = document.getElementById('writing-target-length');
+  if (lengthEl) lengthEl.textContent = task.targetWordCount.ideal;
+
+  const promptEl = document.getElementById('writing-task-prompt');
+  if (promptEl) promptEl.innerHTML = task.prompt;
+
+  // Restore draft
+  if (textarea) {
+    textarea.value = writingDrafts[taskType] || '';
+    textarea.placeholder = taskType === 'cv'
+      ? "Ex: Thibault GUERREC\n14 Avenue de la République, 75011 Paris\n...\n\nPERSONAL STATEMENT\nDynamic 2nd-year undergraduate student in BUT MT2E...\n\nEDUCATION & QUALIFICATIONS\n..."
+      : "Ex: Alexandre DUPONT\n8 Rue des Énergies, 44000 Nantes\n...\n\nDear Mr. Harrison,\n\nI am writing to apply for the position of...\n\nDuring my studies in BUT MT2E...\n\nYours sincerely,\nAlexandre Dupont";
+  }
+
+  // Hide report when switching
+  const reportContainer = document.getElementById('writing-report-container');
+  if (reportContainer) reportContainer.classList.add('hidden');
+
+  // Update model answer
+  const modelPre = document.getElementById('writing-model-pre');
+  if (modelPre) modelPre.textContent = task.modelAnswer;
+
+  const modelContent = document.getElementById('model-comparison-content');
+  if (modelContent) modelContent.classList.add('hidden');
+
+  const modelArrow = document.getElementById('model-toggle-arrow');
+  if (modelArrow) modelArrow.textContent = '▼ Afficher';
+
+  // Live feedback
+  updateWritingLiveFeedback();
+}
+
+function updateWritingLiveFeedback() {
+  const textarea = document.getElementById('writing-textarea');
+  if (!textarea) return;
+  const text = textarea.value;
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  const wordCount = words.length;
+
+  const counterEl = document.getElementById('writing-word-counter');
+  if (counterEl) {
+    counterEl.textContent = `${wordCount} mot${wordCount > 1 ? 's' : ''}`;
+    if (wordCount === 0) {
+      counterEl.style.color = 'var(--text-muted)';
+      counterEl.style.borderColor = 'transparent';
+    } else if (wordCount < 100) {
+      counterEl.style.color = '#f59e0b';
+      counterEl.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+    } else if (wordCount > 350) {
+      counterEl.style.color = '#f87171';
+      counterEl.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+    } else {
+      counterEl.style.color = 'var(--accent-cyan-light)';
+      counterEl.style.borderColor = 'rgba(6, 182, 212, 0.4)';
+    }
+  }
+
+  const result = gradeWriting(currentWritingTask, text);
+  const checklistContainer = document.getElementById('writing-checklist-items');
+  if (!checklistContainer) return;
+  checklistContainer.innerHTML = '';
+
+  let doneCount = 0;
+  result.checklist.forEach(item => {
+    if (item.done) doneCount++;
+    const row = document.createElement('div');
+    row.className = `checklist-item ${item.done ? 'done' : ''}`;
+    row.innerHTML = `
+      <div class="checklist-icon">${item.done ? '✓' : ''}</div>
+      <div style="flex:1;">
+        <div style="font-weight:${item.done ? '600' : '500'};">${item.label}</div>
+        <div style="font-size:0.775rem; color:${item.done ? 'var(--text-muted)' : 'var(--accent-cyan-light)'}; margin-top:2px;">
+          ${item.hint}
+        </div>
+      </div>
+    `;
+    checklistContainer.appendChild(row);
+  });
+
+  const badgeEl = document.getElementById('checklist-progress-badge');
+  if (badgeEl) {
+    badgeEl.textContent = `${doneCount} / ${result.checklist.length}`;
+    if (doneCount === result.checklist.length && result.checklist.length > 0) {
+      badgeEl.className = 'badge badge-green';
+    } else {
+      badgeEl.className = 'badge badge-cyan';
+    }
+  }
+}
+
+function evaluateWritingSubmission() {
+  const textarea = document.getElementById('writing-textarea');
+  if (!textarea) return;
+  const text = textarea.value.trim();
+
+  if (text.length < 20) {
+    alert("Votre texte est trop court pour être évalué. Tapez au moins quelques phrases ou chargez la trame guidée pour démarrer.");
+    return;
+  }
+
+  const result = gradeWriting(currentWritingTask, text);
+  const reportContainer = document.getElementById('writing-report-container');
+  if (!reportContainer) return;
+  reportContainer.classList.remove('hidden');
+
+  // Appreciation & Grade
+  const appEl = document.getElementById('writing-report-appreciation');
+  if (appEl) {
+    appEl.textContent = result.appreciation;
+    appEl.style.color = result.color;
+  }
+
+  const gradeEl = document.getElementById('writing-report-grade');
+  if (gradeEl) {
+    gradeEl.textContent = `${result.score}/20`;
+    gradeEl.style.color = result.color;
+  }
+
+  const wordsEl = document.getElementById('writing-report-words');
+  if (wordsEl) {
+    wordsEl.textContent = `${result.wordCount} mots rédigés`;
+  }
+
+  // Categories Breakdown
+  const catGrid = document.getElementById('writing-categories-grid');
+  if (catGrid) {
+    catGrid.innerHTML = '';
+    Object.values(result.categoryScores).forEach(cat => {
+      const pct = Math.min(100, Math.round((cat.score / cat.max) * 100));
+      let fillGradient = 'linear-gradient(90deg, #10b981, #06b6d4)';
+      let scoreBadgeClass = 'badge-green';
+      if (cat.score < 2.5) {
+        fillGradient = 'linear-gradient(90deg, #ef4444, #f59e0b)';
+        scoreBadgeClass = 'badge-red';
+      } else if (cat.score < 3.75) {
+        fillGradient = 'linear-gradient(90deg, #f59e0b, #06b6d4)';
+        scoreBadgeClass = 'badge-violet';
+      }
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.padding = '1.15rem 1.25rem';
+      card.style.background = 'rgba(255, 255, 255, 0.02)';
+      card.innerHTML = `
+        <div class="flex-between mb-1">
+          <span style="font-weight:600; font-size:0.95rem; color:#f1f5f9;">${cat.label}</span>
+          <span class="badge ${scoreBadgeClass}" style="font-weight:700;">${cat.score} / ${cat.max}</span>
+        </div>
+        <div class="category-bar-bg">
+          <div class="category-bar-fill" style="width:${pct}%; background:${fillGradient};"></div>
+        </div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem;">
+          ${cat.details}
+        </div>
+      `;
+      catGrid.appendChild(card);
+    });
+  }
+
+  // Strengths
+  const strengthsCountEl = document.getElementById('writing-strengths-count');
+  if (strengthsCountEl) strengthsCountEl.textContent = result.strengths.length;
+  const strengthsListEl = document.getElementById('writing-strengths-list');
+  if (strengthsListEl) {
+    strengthsListEl.innerHTML = '';
+    if (result.strengths.length === 0) {
+      strengthsListEl.innerHTML = `<p style="font-size:0.9rem; color:var(--text-muted); font-style:italic;">Aucun point fort spécifique détecté pour l'instant. Enrichis ta copie avec les formules du cours.</p>`;
+    } else {
+      result.strengths.forEach(str => {
+        const item = document.createElement('div');
+        item.className = 'strength-card';
+        item.innerHTML = `
+          <span style="font-size:1.15rem; line-height:1.2;">⭐</span>
+          <div style="font-size:0.925rem; line-height:1.5;">${str}</div>
+        `;
+        strengthsListEl.appendChild(item);
+      });
+    }
+  }
+
+  // Mistakes
+  const mistakesCountEl = document.getElementById('writing-mistakes-count');
+  if (mistakesCountEl) mistakesCountEl.textContent = result.mistakes.length;
+  const mistakesListEl = document.getElementById('writing-mistakes-list');
+  if (mistakesListEl) {
+    mistakesListEl.innerHTML = '';
+    if (result.mistakes.length === 0) {
+      mistakesListEl.innerHTML = `
+        <div class="strength-card" style="border-left-color:var(--success); background:rgba(16,185,129,0.06);">
+          <span style="font-size:1.25rem;">🎉</span>
+          <div style="font-size:0.925rem; line-height:1.5;">
+            <strong>Aucune erreur pénalisante majeure !</strong> Ta copie applique scrupuleusement les exigences du syllabus.
+          </div>
+        </div>
+      `;
+    } else {
+      result.mistakes.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'mistake-card';
+        item.innerHTML = `
+          <div class="flex-between mb-1" style="flex-wrap:wrap; gap:0.5rem;">
+            <strong style="color:#f87171; font-size:0.95rem;">${m.title}</strong>
+            <span class="penalty-pill">-${m.penalty} pt${m.penalty > 1 ? 's' : ''}</span>
+          </div>
+          <p style="margin: 0.35rem 0 0.5rem 0; font-size:0.875rem; color:#cbd5e1; line-height:1.5;">
+            ${m.explanation}
+          </p>
+          <div style="font-size:0.85rem; color:var(--accent-cyan-light); padding:0.4rem 0.6rem; border-radius:6px; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2);">
+            <strong>💡 Conseil partiel :</strong> ${m.fix}
+          </div>
+        `;
+        mistakesListEl.appendChild(item);
+      });
+    }
+  }
+
+  // Ensure model answer is loaded
+  const modelPre = document.getElementById('writing-model-pre');
+  if (modelPre) modelPre.textContent = WRITING_TASKS[currentWritingTask].modelAnswer;
+
+  // Smooth scroll to report
+  reportContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================================
 // EVENT LISTENERS & SETUP
 // ============================================================================
 function setupEventListeners() {
+  // Writing Lab navigation from View Selector
+  const cardWritingLab = document.getElementById('card-open-writing-lab');
+  if (cardWritingLab) {
+    cardWritingLab.addEventListener('click', (e) => {
+      if (e.target.closest('#btn-open-cv-task') || e.target.closest('#btn-open-cl-task')) return;
+      openWritingLab('cv');
+    });
+  }
+
+  const btnOpenCv = document.getElementById('btn-open-cv-task');
+  if (btnOpenCv) {
+    btnOpenCv.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openWritingLab('cv');
+    });
+  }
+
+  const btnOpenCl = document.getElementById('btn-open-cl-task');
+  if (btnOpenCl) {
+    btnOpenCl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openWritingLab('cover-letter');
+    });
+  }
+
+  // Writing Lab internal tabs
+  const tabCv = document.getElementById('tab-write-cv');
+  if (tabCv) tabCv.addEventListener('click', () => switchWritingTask('cv'));
+
+  const tabCl = document.getElementById('tab-write-cl');
+  if (tabCl) tabCl.addEventListener('click', () => switchWritingTask('cover-letter'));
+
+  const quitWritingBtn = document.getElementById('btn-quit-writing');
+  if (quitWritingBtn) quitWritingBtn.addEventListener('click', quitWritingLab);
+
+  const cheatWritingBtn = document.getElementById('btn-open-cheatsheet-writing');
+  if (cheatWritingBtn) cheatWritingBtn.addEventListener('click', openCheatsheet);
+
+  // Writing Toolbar
+  const templateBtn = document.getElementById('btn-load-template');
+  if (templateBtn) {
+    templateBtn.addEventListener('click', () => {
+      const textarea = document.getElementById('writing-textarea');
+      if (textarea.value.trim().length > 20) {
+        if (!confirm('Remplacer le texte actuel par la trame type guidée ?')) return;
+      }
+      textarea.value = WRITING_TASKS[currentWritingTask].sampleTemplate;
+      writingDrafts[currentWritingTask] = textarea.value;
+      updateWritingLiveFeedback();
+      textarea.focus();
+    });
+  }
+
+  const showModelBtn = document.getElementById('btn-show-model');
+  if (showModelBtn) {
+    showModelBtn.addEventListener('click', () => {
+      const content = document.getElementById('model-comparison-content');
+      const arrow = document.getElementById('model-toggle-arrow');
+      if (!content) return;
+      const isHidden = content.classList.contains('hidden');
+      if (isHidden) {
+        content.classList.remove('hidden');
+        if (arrow) arrow.textContent = '▲ Masquer';
+        content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        content.classList.add('hidden');
+        if (arrow) arrow.textContent = '▼ Afficher';
+      }
+    });
+  }
+
+  const toggleComparison = document.getElementById('toggle-model-comparison');
+  if (toggleComparison) {
+    toggleComparison.addEventListener('click', () => {
+      const content = document.getElementById('model-comparison-content');
+      const arrow = document.getElementById('model-toggle-arrow');
+      if (!content) return;
+      const isHidden = content.classList.contains('hidden');
+      content.classList.toggle('hidden');
+      if (arrow) arrow.textContent = isHidden ? '▲ Masquer' : '▼ Afficher';
+    });
+  }
+
+  const clearBtn = document.getElementById('btn-clear-editor');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      const textarea = document.getElementById('writing-textarea');
+      if (textarea && textarea.value.trim().length > 0) {
+        if (!confirm('Effacer tout le texte du rédacteur ?')) return;
+        textarea.value = '';
+        writingDrafts[currentWritingTask] = '';
+        updateWritingLiveFeedback();
+        document.getElementById('writing-report-container')?.classList.add('hidden');
+        textarea.focus();
+      }
+    });
+  }
+
+  // Textarea input debounced live feedback
+  const writingTextarea = document.getElementById('writing-textarea');
+  if (writingTextarea) {
+    let debounceTimer = null;
+    writingTextarea.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        writingDrafts[currentWritingTask] = writingTextarea.value;
+        updateWritingLiveFeedback();
+      }, 150);
+    });
+  }
+
+  // Evaluation button
+  const evalBtn = document.getElementById('btn-evaluate-writing');
+  if (evalBtn) evalBtn.addEventListener('click', evaluateWritingSubmission);
+
+  // Bottom action buttons in report
+  const editWritingBtn = document.getElementById('btn-edit-writing-text');
+  if (editWritingBtn) {
+    editWritingBtn.addEventListener('click', () => {
+      const textarea = document.getElementById('writing-textarea');
+      if (textarea) {
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        textarea.focus();
+      }
+    });
+  }
+
+  const switchTaskBtn = document.getElementById('btn-switch-writing-task');
+  if (switchTaskBtn) {
+    switchTaskBtn.addEventListener('click', () => {
+      const nextTask = currentWritingTask === 'cv' ? 'cover-letter' : 'cv';
+      switchWritingTask(nextTask);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   // Cheatsheet modal
   const openHero = document.getElementById('btn-open-cheatsheet-hero');
   if (openHero) openHero.addEventListener('click', openCheatsheet);

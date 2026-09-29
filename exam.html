@@ -143,7 +143,7 @@
             </div>
 
             <!-- Simulation Grand Examen Blanc -->
-            <div class="module-card mock-exam-card mb-8 animate-slide-up" id="btn-start-mock-exam" style="padding: 2rem;">
+            <div class="module-card mock-exam-card mb-6 animate-slide-up" id="btn-start-mock-exam" style="padding: 2rem;">
                 <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
@@ -158,6 +158,30 @@
                     <button class="btn btn-primary btn-lg" style="box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);">
                         Lancer l'Examen Blanc →
                     </button>
+                </div>
+            </div>
+
+            <!-- Atelier Expression Écrite : CV ou Lettre de Motivation -->
+            <div class="writing-hero-card mb-8 animate-slide-up" id="card-open-writing-lab">
+                <div class="flex-between" style="flex-wrap: wrap; gap: 1.5rem;">
+                    <div style="max-width: 680px;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+                            <span style="font-size:1.6rem;">✍️</span>
+                            <h2 style="margin: 0; font-size: 1.4rem; color: #f8fafc;">Épreuve Finale : Expression Écrite (CV ou Cover Letter)</h2>
+                            <span class="badge badge-cyan" style="font-weight:700;">Notation IA sur 20</span>
+                        </div>
+                        <p style="color: #cbd5e1; margin: 0; font-size: 0.95rem; line-height: 1.6;">
+                            Rédige ton <strong>CV</strong> ou ta <strong>lettre de motivation</strong> en anglais et soumets-la à notre système de notation intelligente : analyse des 7 sections, vérification des diplômes (BUT MT2E, A-levels), calcul des pénalités du partiel et corrigé type.
+                        </p>
+                    </div>
+                    <div class="flex-center" style="gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-lg" id="btn-open-cv-task" style="border-color: var(--accent-cyan);">
+                            📄 Rédiger un CV
+                        </button>
+                        <button class="btn btn-primary btn-lg" id="btn-open-cl-task" style="box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);">
+                            ✉️ Rédiger une Cover Letter
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -275,7 +299,198 @@
                 <div id="results-questions-list" style="display:flex; flex-direction:column; gap:1rem;">
                     <!-- Question items injected here -->
                 </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 4: WRITING LAB / EXPRESSION ÉCRITE -->
+        <!-- ================================================================= -->
+        <div id="view-writing" class="hidden animate-slide-up">
+            <div class="flex-between mb-4" style="flex-wrap:wrap; gap:1rem;">
+                <button id="btn-quit-writing" class="btn btn-ghost btn-sm" style="color:var(--text-secondary);">
+                    ← Retour aux modules
+                </button>
+                <div class="flex-center" style="gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="writing-tab-btn active" id="tab-write-cv" data-task="cv">
+                        <span>📄</span> Option 1 : Rédiger un CV
+                    </button>
+                    <button class="writing-tab-btn" id="tab-write-cl" data-task="cover-letter">
+                        <span>✉️</span> Option 2 : Cover Letter
+                    </button>
+                    <button id="btn-open-cheatsheet-writing" class="btn btn-ghost btn-sm" style="color:var(--accent-cyan-light); border:1px solid rgba(6,182,212,0.3); padding:0.3rem 0.75rem;">
+                        📖 Voir le cours
+                    </button>
+                </div>
             </div>
+
+            <!-- Subject & Instructions Card -->
+            <div class="card mb-6" style="padding: 1.75rem 2rem; border-color: rgba(139, 92, 246, 0.3);">
+                <div class="flex-between mb-3" style="flex-wrap:wrap; gap:0.5rem;">
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <span id="writing-task-icon" style="font-size:1.75rem;">📄</span>
+                        <div>
+                            <h2 id="writing-task-title" style="margin:0; font-size:1.4rem;">Curriculum Vitae (CV)</h2>
+                            <span class="badge badge-violet" id="writing-task-badge">Sujet Officiel d'Examen</span>
+                        </div>
+                    </div>
+                    <div style="font-size:0.9rem; color:var(--text-secondary); text-align:right;">
+                        Longueur conseillée : <strong id="writing-target-length" style="color:var(--accent-cyan-light);">180 - 280 mots</strong>
+                    </div>
+                </div>
+                <div id="writing-task-prompt" style="color:#cbd5e1; font-size:0.95rem; line-height:1.6;">
+                    <!-- Injected prompt -->
+                </div>
+            </div>
+
+            <!-- Editor & Checklist Grid -->
+            <div class="grid-3 mb-6" style="grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: flex-start;">
+                
+                <!-- Left: Editor & Action bar -->
+                <div>
+                    <!-- Toolbar -->
+                    <div class="flex-between mb-2" style="flex-wrap:wrap; gap:0.5rem;">
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <button class="btn btn-ghost btn-sm" id="btn-load-template" style="border: 1px solid var(--border); font-size:0.85rem;">
+                                📋 Charger la trame guidée
+                            </button>
+                            <button class="btn btn-ghost btn-sm" id="btn-show-model" style="border: 1px solid rgba(6,182,212,0.3); color:var(--accent-cyan-light); font-size:0.85rem;">
+                                ⭐ Voir le modèle 20/20
+                            </button>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span class="badge" id="writing-word-counter" style="background:rgba(255,255,255,0.06); font-family:'Fira Code',monospace; font-size:0.85rem;">0 mots</span>
+                            <button class="btn btn-ghost btn-sm" id="btn-clear-editor" style="color:var(--text-muted); font-size:0.85rem;" title="Effacer tout">
+                                🗑️ Effacer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Textarea -->
+                    <textarea id="writing-textarea" class="writing-textarea" placeholder="Rédige ton texte en anglais ici..."></textarea>
+
+                    <!-- Evaluation Trigger Button -->
+                    <div class="mt-4">
+                        <button id="btn-evaluate-writing" class="btn btn-primary btn-lg" style="width:100%; box-shadow:0 0 30px rgba(139, 92, 246, 0.4); font-size:1.15rem; padding:1.1rem;">
+                            🚀 Évaluer mon expression écrite (Notation IA /20) →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Live Checklist & Exam Tips -->
+                <div>
+                    <!-- Checklist Card -->
+                    <div class="checklist-card mb-4">
+                        <div class="flex-between mb-3">
+                            <h3 style="font-size:1.05rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+                                <span>📋</span> Checklist en direct
+                            </h3>
+                            <span class="badge badge-cyan" id="checklist-progress-badge">0 / 7</span>
+                        </div>
+                        <p style="font-size:0.825rem; color:var(--text-muted); margin-bottom:0.75rem;">
+                            Critères officiels du partiel vérifiés dans ta copie :
+                        </p>
+                        <div id="writing-checklist-items">
+                            <!-- Items injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Exam Rules Card -->
+                    <div class="card" style="padding:1.25rem;">
+                        <h4 style="font-size:0.95rem; margin-bottom:0.5rem; color:var(--accent-cyan-light); display:flex; align-items:center; gap:0.4rem;">
+                            <span>💡</span> Règles d'or du prof
+                        </h4>
+                        <ul style="font-size:0.85rem; line-height:1.5; color:#94a3b8; padding-left:1.1rem; margin:0;" id="writing-tips-list">
+                            <li>Ne jamais écrire <em>stage</em> (écris <em>internship</em> ou <em>work placement</em>).</li>
+                            <li>Ne jamais écrire <em>mention</em> (écris <em>with honours</em>).</li>
+                            <li><em>Dear Mr. X</em> → obligatoirement <em>Yours sincerely</em>.</li>
+                            <li><em>Dear Sir or Madam</em> → obligatoirement <em>Yours faithfully</em>.</li>
+                            <li>BUT MT2E = <em>Bachelor of Technology in Energy Transition and Efficiency</em>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================================================================= -->
+            <!-- EVALUATION RESULTS ACCORDION / REPORT -->
+            <!-- ================================================================= -->
+            <div id="writing-report-container" class="hidden card animate-slide-up" style="padding:2.5rem; margin-top:2rem; border-color:var(--accent-violet);">
+                <!-- Header with Grade -->
+                <div class="flex-between mb-6" style="flex-wrap:wrap; gap:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1.5rem;">
+                    <div>
+                        <span class="badge badge-violet mb-2">Résultat de la correction automatique</span>
+                        <h2 style="font-size:2rem; margin:0;" class="text-gradient">Bilan de ton Expression Écrite</h2>
+                        <p id="writing-report-appreciation" style="font-size:1.1rem; color:#f1f5f9; margin-top:0.25rem; font-weight:600;"></p>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:1.5rem;">
+                        <div style="width:120px; height:120px; border-radius:50%; background:linear-gradient(135deg, rgba(139,92,246,0.2), rgba(6,182,212,0.2)); border:3px solid var(--accent-violet); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                            <div id="writing-report-grade" style="font-size:2.3rem; font-weight:800; color:#f8fafc; line-height:1;">17/20</div>
+                            <div id="writing-report-words" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">210 mots</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Category Breakdown Bars -->
+                <h3 style="font-size:1.15rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+                    <span>📊</span> Détail des 4 Piliers de Notation (/5 chacun)
+                </h3>
+                <div class="grid-2 mb-8" id="writing-categories-grid" style="gap:1rem;">
+                    <!-- Injected bars -->
+                </div>
+
+                <!-- Strengths & Mistakes -->
+                <div class="grid-2 mb-8" style="gap:1.5rem; align-items:flex-start;">
+                    <!-- Strengths (Green) -->
+                    <div>
+                        <h3 style="font-size:1.15rem; margin-bottom:1rem; color:var(--success); display:flex; align-items:center; gap:0.5rem;">
+                            <span>✅</span> Points Forts Identifiés (<span id="writing-strengths-count">0</span>)
+                        </h3>
+                        <div id="writing-strengths-list">
+                            <!-- Injected strengths -->
+                        </div>
+                    </div>
+
+                    <!-- Mistakes & Penalties (Red/Orange) -->
+                    <div>
+                        <h3 style="font-size:1.15rem; margin-bottom:1rem; color:var(--error); display:flex; align-items:center; gap:0.5rem;">
+                            <span>⚠️</span> Erreurs & Pénalités du Partiel (<span id="writing-mistakes-count">0</span>)
+                        </h3>
+                        <div id="writing-mistakes-list">
+                            <!-- Injected penalties -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Answer Comparison Box (Collapsible) -->
+                <div class="card mb-6" style="background:rgba(0,0,0,0.3); border-color:rgba(6,182,212,0.3);">
+                    <div class="flex-between" style="cursor:pointer;" id="toggle-model-comparison">
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="font-size:1.3rem;">⭐</span>
+                            <h3 style="margin:0; font-size:1.1rem; color:var(--accent-cyan-light);">
+                                Comparer avec le Modèle de Référence (Copie à 20/20)
+                            </h3>
+                        </div>
+                        <span id="model-toggle-arrow" style="color:var(--text-muted); font-size:1.1rem;">▼ Afficher</span>
+                    </div>
+                    <div id="model-comparison-content" class="hidden mt-4">
+                        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:0.75rem;">
+                            Voici un exemple de copie modèle respectant tous les critères du syllabus et les formulations attendues :
+                        </p>
+                        <pre class="model-answer-pre" id="writing-model-pre"></pre>
+                    </div>
+                </div>
+
+                <!-- Bottom Action Buttons -->
+                <div class="flex-between mt-6" style="flex-wrap:wrap; gap:1rem;">
+                    <button class="btn btn-secondary" id="btn-edit-writing-text">
+                        ✏️ Modifier mon texte pour améliorer ma note
+                    </button>
+                    <button class="btn btn-primary" id="btn-switch-writing-task">
+                        🔄 Essayer l'autre épreuve (CV / Cover Letter) →
+                    </button>
+                </div>
+            </div>
+
         </div>
 
     </main>
