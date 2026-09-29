@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Pro — Practice & Master the TOEIC</title>
+  <meta name="description" content="Practice the TOEIC written exam online. Grammar, Part 5, 6 & 7. Track your progress.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Inline additions just for completeness, assuming they are in style.css */
+    .shake { animation: shake 0.4s; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .text-red { color: var(--error); }
+    .user-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 0.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1100; min-width: 140px; }
+    .d-inline-flex { display: inline-flex; }
+    .align-center { align-items: center; }
+    .font-bold { font-weight: 700; }
+    .w-full { width: 100%; }
+    .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-3xl { font-size: 1.875rem; }
+    .text-4xl { font-size: 2.25rem; }
+    .uppercase { text-transform: uppercase; }
+    .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+    .border-t { border-top: 1px solid #eaeaea; }
+    .mt-auto { margin-top: auto; }
+    .text-decoration-none { text-decoration: none; color: inherit; }
+    .block { display: block; }
+    .relative { position: relative; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .mr-2 { margin-right: 0.5rem; }
+  </style>
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+  <!-- Navbar -->
+  <nav class="navbar flex-between mb-8">
+    <div class="nav-logo d-inline-flex align-center">
+      <div class="nav-logo-icon mr-2">T</div>
+      <span class="text-gradient font-bold">TOEIC Pro</span>
+    </div>
+    <div class="nav-links d-inline-flex align-center">
+      <a href="index.html" class="nav-link active mr-4">Home</a>
+      <a href="progress.html" class="nav-link">Progress</a>
+    </div>
+    <div class="user-chip-container relative">
+      <div class="user-chip d-inline-flex align-center" id="user-chip" tabindex="0" style="cursor:pointer;">
+        <div class="user-avatar mr-2" id="user-avatar">?</div>
+        <span class="user-name" id="user-name">Guest</span>
+      </div>
+      <div class="user-dropdown hidden" id="user-dropdown">
+        <button class="btn btn-ghost" id="btn-switch-user">Switch User</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Pseudo Modal -->
+  <div class="modal-overlay" id="pseudo-modal">
+    <div class="modal-box text-center animate-slide-up">
+      <h2>Welcome to TOEIC Pro</h2>
+      <p class="text-muted mb-6 mt-4">Enter your name to track your progress</p>
+      <div class="input-group mb-6">
+        <input type="text" class="input w-full" id="pseudo-input" placeholder="Your name or nickname" autocomplete="off" style="padding:0.75rem;">
+        <p class="error-text hidden mt-4 text-red" id="pseudo-error">Please enter at least 2 characters.</p>
+      </div>
+      <button class="btn btn-primary btn-lg w-full" id="pseudo-submit">Get Started &rarr;</button>
+    </div>
+  </div>
+
+  <main class="container" style="flex: 1; max-width: 1000px; margin: 0 auto; padding: 0 1rem;">
+    <!-- Hero Section -->
+    <section class="hero text-center mb-8 animate-fade-in">
+      <span class="badge badge-violet mb-4">✦ Free &middot; No sign-up</span>
+      <h1 class="text-4xl mt-4 mb-4">Master the <span class="text-gradient">TOEIC</span></h1>
+      <p class="tagline text-muted mt-4">Practice Part 5, 6 & 7 with smart question banks, instant grammar feedback, and detailed progress tracking.</p>
+      <div id="streak-container" class="mt-6 hidden">
+        <div class="streak-widget d-inline-flex align-center badge badge-violet">
+          <span class="streak-fire mr-2">🔥</span>
+          <span id="streak-value" class="font-bold mr-2"></span> day streak
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Row -->
+    <section class="stats-section mb-8 animate-slide-up" style="margin-top: 3rem;">
+      <div class="grid-4">
+        <div class="stat-card card text-center mb-4">
+          <div class="stat-icon mb-2 text-2xl">📚</div>
+          <div class="stat-label text-muted text-sm uppercase font-bold mb-1 mt-4">Sessions Done</div>
+          <div class="stat-value text-3xl font-bold mt-4" id="stat-sessions">&mdash;</div>
+        </div>
+        <div class="stat-card card text-center mb-4">
+          <div class="stat-icon mb-2 text-2xl">📊</div>
+          <div class="stat-label text-muted text-sm uppercase font-bold mb-1 mt-4">Average Score</div>
+          <div class="stat-value text-3xl font-bold mt-4" id="stat-avg">&mdash;</div>
+        </div>
+        <div class="stat-card card text-center mb-4">
+          <div class="stat-icon mb-2 text-2xl">🏆</div>
+          <div class="stat-label text-muted text-sm uppercase font-bold mb-1 mt-4">Best Score</div>
+          <div class="stat-value text-3xl font-bold mt-4" id="stat-best">&mdash;</div>
+        </div>
+        <div class="stat-card card text-center mb-4">
+          <div class="stat-icon mb-2 text-2xl">✅</div>
+          <div class="stat-label text-muted text-sm uppercase font-bold mb-1 mt-4">Questions Answered</div>
+          <div class="stat-value text-3xl font-bold mt-4" id="stat-questions">&mdash;</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mode Cards -->
+    <section class="modes-section mb-8 animate-slide-up" style="animation-delay: 0.1s; margin-top: 3rem;">
+      <div class="grid-2">
+        <a href="selection.html?mode=toeic" class="mode-card block card text-decoration-none text-center mb-4">
+          <div class="mode-icon text-4xl mb-4">🎯</div>
+          <h3 class="mode-title mb-2 mt-4 text-2xl font-bold">TOEIC Test</h3>
+          <p class="mode-desc text-muted mb-4 mt-4">Simulate the real exam. Part 5, 6 & 7. Answers revealed at the end.</p>
+          <div class="btn btn-primary mt-4">Start Test</div>
+        </a>
+        <a href="selection.html?mode=custom" class="mode-card block card text-decoration-none text-center mb-4">
+          <div class="mode-icon text-4xl mb-4">✏️</div>
+          <h3 class="mode-title mb-2 mt-4 text-2xl font-bold">Custom Training</h3>
+          <p class="mode-desc text-muted mb-4 mt-4">Choose your themes, set your time, and get instant feedback.</p>
+          <div class="btn btn-secondary mt-4">Train Now</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Recent Sessions -->
+    <section class="recent-sessions-section mb-8 animate-slide-up" style="animation-delay: 0.2s; margin-top: 3rem; margin-bottom: 3rem;">
+      <div class="flex-between mb-4">
+        <h2 class="text-2xl font-bold">Recent Sessions</h2>
+        <a href="progress.html" class="link hidden" id="view-all-link">View all &rarr;</a>
+      </div>
+      <div id="recent-sessions-container">
+        <!-- Empty state default -->
+        <div class="empty-state text-center py-8 card">
+          <div class="empty-state-icon text-4xl mb-4">📖</div>
+          <p class="text-muted mt-4">No sessions yet. Start your first training!</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center py-6 text-muted text-sm border-t mt-auto">
+    TOEIC Pro &middot; Built for learners &middot; <span id="current-year"></span>
+  </footer>
+
+  <script type="module" src="js/index.js"></script>
+  <script>
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

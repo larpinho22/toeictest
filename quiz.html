@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Grammar Training - Quiz</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container flex-between">
+      <a href="index.html" class="nav-logo text-gradient">TOEIC Trainer</a>
+      <div class="user-chip">
+        <span class="user-avatar" id="user-avatar">?</span>
+        <span class="user-name" id="user-name">Guest</span>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Timer bar at top -->
+  <div class="timer-bar-container">
+    <div class="timer-bar" id="timer-bar"></div>
+  </div>
+  
+  <!-- Loading Overlay (shown while data.js loads) -->
+  <div id="quiz-loading" style="
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg-primary);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1.5rem;
+  ">
+    <div style="
+      width: 56px; height: 56px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent-violet);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    "></div>
+    <p style="color: var(--text-secondary); font-size: 1rem;">Preparing your questions&hellip;</p>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  </div>
+
+  <main style="padding: 100px 0 60px;">
+    <div class="container">
+      
+      <!-- Quiz Header -->
+      <div class="quiz-header">
+        <div class="quiz-progress">
+          <div class="quiz-progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="flex-between mt-4">
+          <span id="question-counter" class="text-muted">Question 1 / 20</span>
+          <div class="timer-badge" id="timer-badge">⏱ 45:00</div>
+        </div>
+      </div>
+      
+      <!-- Quiz Card -->
+      <div class="quiz-card animate-fade-in" id="quiz-card">
+        
+        <!-- Passage (Part 6 & 7, hidden for Part 5) -->
+        <div id="passage-container" class="hidden">
+          <div class="flex-between mb-4">
+            <span class="badge badge-cyan" id="passage-title">Reading Passage</span>
+            <button class="btn btn-ghost btn-sm" id="toggle-passage">Hide passage ▲</button>
+          </div>
+          <div class="passage-box" id="passage-text"></div>
+        </div>
+        
+        <!-- Question -->
+        <div class="question-meta mb-4">
+          <span class="badge badge-violet" id="question-part-badge">Part 5</span>
+          <span class="badge" id="question-theme-badge"></span>
+        </div>
+        <p class="question-text" id="question-text">Loading...</p>
+        
+        <!-- Options -->
+        <div class="options-grid" id="options-grid">
+          <!-- Rendered by JS -->
+        </div>
+        
+        <!-- Explanation (Custom mode only, shown after answer) -->
+        <div class="explanation-box" id="explanation-box">
+          <strong id="explanation-result"></strong>
+          <p id="explanation-text" class="mt-4"></p>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="flex-between mt-8">
+          <button class="btn btn-ghost" id="btn-skip">Skip →</button>
+          <div style="display:flex; gap:1rem;">
+            <button class="btn btn-ghost" id="btn-prev" style="display:none;">← Prev</button>
+            <button class="btn btn-primary" id="btn-next" disabled>Next →</button>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Finish button (appears when on last question) -->
+      <div class="text-center mt-8" id="finish-container" style="display:none;">
+        <button class="btn btn-primary btn-lg" id="btn-finish">Finish & See Results 🎯</button>
+      </div>
+      
+    </div>
+  </main>
+  
+  <script type="module" src="js/quiz.js"></script>
+</body>
+</html>

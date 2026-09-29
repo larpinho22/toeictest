@@ -1,0 +1,5 @@
+# Netlify redirects and pretty URLs
+/selection   /selection.html   200
+/quiz        /quiz.html        200
+/results     /results.html     200
+/progress    /progress.html    200

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Session - TOEIC Practice</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .mode-card { cursor: pointer; }
+    .mode-card.selected { border-color: var(--accent-violet) !important; background: rgba(139, 92, 246, 0.07); }
+    .theme-item.selected { border-color: var(--accent-violet); }
+    .text-danger { color: var(--error); }
+    .part-label { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem 0; font-size: 0.95rem; color: var(--text-secondary); }
+    .part-label:hover { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container flex-between">
+      <a href="index.html" class="nav-logo">TOEIC Trainer</a>
+      <div class="user-chip" id="user-chip">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span id="user-name">Guest</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container animate-fade-in" style="padding-top: 96px; padding-bottom: 4rem;">
+    <h1 class="text-center mb-8">Set Up Your Session</h1>
+    
+    <!-- Section 1: MODE SELECTOR -->
+    <section class="mb-8">
+      <h2 class="mb-4 text-gradient">1. Choose Mode</h2>
+      <div class="grid-2">
+        <div class="mode-card card" data-mode="toeic">
+          <div class="mode-icon" style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+          <h3 class="mode-title">TOEIC Test</h3>
+          <p class="mode-desc">Full simulation of reading parts. Standard distribution.</p>
+        </div>
+        <div class="mode-card card" data-mode="custom">
+          <div class="mode-icon" style="font-size: 2rem; margin-bottom: 0.5rem;">✏️</div>
+          <h3 class="mode-title">Custom Training</h3>
+          <p class="mode-desc">Target specific parts and grammar themes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: PARTS -->
+    <section class="mb-8" id="parts-section">
+      <h2 class="mb-4 text-gradient">2. Select Parts</h2>
+      <div class="card">
+        <div id="parts-custom" style="display:flex; flex-direction:column; gap:0.5rem;">
+          <label class="part-label">
+            <input type="checkbox" class="custom-checkbox" value="5" checked>
+            <span>Part 5 — Incomplete Sentences (Grammar)</span>
+          </label>
+          <label class="part-label">
+            <input type="checkbox" class="custom-checkbox" value="6" checked>
+            <span>Part 6 — Text Completion (Grammar in context)</span>
+          </label>
+          <label class="part-label">
+            <input type="checkbox" class="custom-checkbox" value="7" checked>
+            <span>Part 7 — Reading Comprehension</span>
+          </label>
+        </div>
+        <div id="parts-toeic" class="hidden">
+          <div class="alert-info" style="padding: 1rem; background: rgba(0,200,255,0.1); border-radius: 8px;">
+            <span class="badge badge-cyan">Locked</span> Parts 5, 6, and 7 are included in the standard TOEIC Reading test.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: THEME SELECTION -->
+    <section class="mb-8 hidden" id="themes-section">
+      <div class="flex-between mb-4">
+        <h2 class="text-gradient m-0">3. Select Themes</h2>
+        <div class="tabs" style="display:flex; gap:0.5rem;">
+          <button class="btn btn-sm btn-primary" id="tab-quick">Quick</button>
+          <button class="btn btn-sm btn-ghost" id="tab-custom">Custom</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="flex-between mb-4">
+          <span class="theme-count font-bold" id="theme-count">0 Selected</span>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-sm btn-ghost" id="btn-select-all">Select All</button>
+            <button class="btn btn-sm btn-ghost" id="btn-deselect-all">Deselect All</button>
+          </div>
+        </div>
+        <div class="theme-grid" id="theme-grid" style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: TIME SLIDER -->
+    <section class="mb-8">
+      <h2 class="mb-4 text-gradient">Time Limit</h2>
+      <div class="card time-slider-container">
+        <div class="time-presets mb-4" style="display:flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+          <button class="preset-btn btn btn-sm btn-ghost" data-time="5">5 min</button>
+          <button class="preset-btn btn btn-sm btn-ghost" data-time="10">10 min</button>
+          <button class="preset-btn btn btn-sm btn-ghost" data-time="20">20 min</button>
+          <button class="preset-btn btn btn-sm btn-ghost" data-time="30">30 min</button>
+          <button class="preset-btn btn btn-sm btn-ghost" data-time="45">45 min</button>
+          <button class="preset-btn btn btn-sm btn-primary active" data-time="75">75 min</button>
+        </div>
+        
+        <input type="range" id="time-slider" min="5" max="120" step="5" value="75" style="width: 100%; margin: 1.5rem 0;">
+        
+        <div class="flex-between mt-4">
+          <div class="time-display text-gradient" style="font-size: 2.5rem; font-weight: bold;"><span id="time-value">75</span> min</div>
+          <div class="time-display" style="font-size: 1.2rem; color: var(--text-secondary);">~<span id="q-estimate">100</span> questions</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: START BUTTON -->
+    <div class="text-center mt-8 mb-8" style="display:flex; flex-direction:column; align-items:center;">
+      <button class="btn btn-primary btn-lg" id="btn-start" style="width: 100%; max-width: 400px; font-size: 1.25rem;">Start Session →</button>
+      <div id="start-error" class="text-danger mt-4 hidden"></div>
+    </div>
+  </main>
+
+  <script type="module" src="js/selection.js"></script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+import { getUser, saveSession } from './storage.js';
+import { THEMES, questions, passages6, passages7 } from './data.js';
+
+// DOM Elements
+const timerBar = document.getElementById('timer-bar');
+const timerBadge = document.getElementById('timer-badge');
+const progressBar = document.getElementById('progress-bar');
+const questionCounter = document.getElementById('question-counter');
+const quizCard = document.getElementById('quiz-card');
+const passageContainer = document.getElementById('passage-container');
+const passageTitle = document.getElementById('passage-title');
+const passageTextEl = document.getElementById('passage-text');
+const togglePassageBtn = document.getElementById('toggle-passage');
+const questionPartBadge = document.getElementById('question-part-badge');
+const questionThemeBadge = document.getElementById('question-theme-badge');
+const questionText = document.getElementById('question-text');
+const optionsGrid = document.getElementById('options-grid');
+const explanationBox = document.getElementById('explanation-box');
+const explanationResult = document.getElementById('explanation-result');
+const explanationText = document.getElementById('explanation-text');
+const btnSkip = document.getElementById('btn-skip');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const finishContainer = document.getElementById('finish-container');
+const btnFinish = document.getElementById('btn-finish');
+
+// State
+let config = null;
+let items = [];
+let currentIndex = 0;
+const userAnswers = []; // array of {questionId, userAnswer, correct, theme, subtopic, part}
+let timeRemaining = 0; // seconds
+let timerInterval = null;
+
+// Initialization
+function init() {
+  try {
+    const user = getUser();
+    if (!user) {
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    config = JSON.parse(sessionStorage.getItem('toeic_quiz_config') || 'null');
+    if (!config) {
+      window.location.href = 'selection.html';
+      return;
+    }
+    
+    // Update user chip in navbar
+    document.getElementById('user-avatar').textContent = user.name[0].toUpperCase();
+    document.getElementById('user-name').textContent = user.name;
+    
+    // Build question list
+    items = buildQuestionList(config, questions, passages6, passages7);
+    
+    if (items.length === 0) {
+      sessionStorage.setItem('toeic_selection_error', 'No questions match your selection. Try selecting more themes.');
+      window.location.href = 'selection.html';
+      return;
+    }
+    
+    timeRemaining = config.timeMinutes * 60;
+    
+    // Event listeners
+    btnNext.addEventListener('click', goNext);
+    btnPrev.addEventListener('click', goPrev);
+    btnSkip.addEventListener('click', skipAnswer);
+    btnFinish.addEventListener('click', finishQuiz);
+    
+    togglePassageBtn.addEventListener('click', () => {
+      const isVisible = passageTextEl.style.display !== 'none';
+      passageTextEl.style.display = isVisible ? 'none' : 'block';
+      togglePassageBtn.textContent = isVisible ? 'Show passage ▼' : 'Hide passage ▲';
+    });
+    
+    // Hide loading overlay
+    const loadingEl = document.getElementById('quiz-loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+    
+    // Init timer and render first question
+    startTimer();
+    renderQuestion(0);
+    
+  } catch (err) {
+    console.error('Quiz init error:', err);
+    const loadingEl = document.getElementById('quiz-loading');
+    if (loadingEl) {
+      loadingEl.innerHTML = `
+        <div style="text-align:center; color:var(--error);">
+          <div style="font-size:3rem;">⚠️</div>
+          <h2 style="margin:1rem 0;">Failed to load quiz</h2>
+          <p style="color:var(--text-muted); margin-bottom:1.5rem;">${err.message}</p>
+          <a href="selection.html" style="color:var(--accent-violet);">← Back to selection</a>
+        </div>`;
+    }
+  }
+}
+
+// Fix for DOMContentLoaded race condition with large ES module imports:
+// If data.js finishes loading after DOMContentLoaded fires, we call init() directly.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+// Helper functions
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildQuestionList(config, questions, passages6, passages7) {
+  // Returns flat array of "items" each being:
+  // { questionData, passageText (or null), passageTitle (or null), indexInPassage, totalInPassage }
+  
+  const items = [];
+  
+  // Part 5
+  if (config.parts.includes(5)) {
+    const p5 = questions.filter(q => {
+      if (config.drillMistakes) return config.missedQuestionIds.includes(q.id);
+      if (config.themes && config.themes.length > 0 && !config.themes.includes(q.theme)) return false;
+      if (config.subtopics && config.subtopics.length > 0 && !config.subtopics.includes(q.subtopic)) return false;
+      return true;
+    });
+    shuffle(p5);
+    items.push(...p5.map(q => ({ questionData: q, passageText: null, passageTitle: null, indexInPassage: 1, totalInPassage: 1 })));
+  }
+  
+  // Part 6
+  if (config.parts.includes(6)) {
+    let p6passages = [...passages6];
+    if (config.drillMistakes) {
+      p6passages = p6passages.map(p => ({ ...p, questions: p.questions.filter(q => config.missedQuestionIds.includes(q.id)) })).filter(p => p.questions.length > 0);
+    }
+    shuffle(p6passages);
+    p6passages.forEach(passage => {
+      passage.questions.forEach((q, idx) => {
+        items.push({ questionData: q, passageText: passage.text, passageTitle: passage.title, indexInPassage: idx + 1, totalInPassage: passage.questions.length });
+      });
+    });
+  }
+  
+  // Part 7
+  if (config.parts.includes(7)) {
+    let p7passages = [...passages7];
+    if (config.drillMistakes) {
+      p7passages = p7passages.map(p => ({ ...p, questions: p.questions.filter(q => config.missedQuestionIds.includes(q.id)) })).filter(p => p.questions.length > 0);
+    }
+    shuffle(p7passages);
+    p7passages.forEach(passage => {
+      passage.questions.forEach((q, idx) => {
+        items.push({ questionData: q, passageText: passage.text, passageTitle: passage.title, indexInPassage: idx + 1, totalInPassage: passage.questions.length });
+      });
+    });
+  }
+  
+  // Limit by time budget
+  const timeSeconds = config.timeMinutes * 60;
+  let totalTime = 0;
+  const limited = [];
+  for (const item of items) {
+    const qTime = item.questionData.part === 5 ? 35 : item.questionData.part === 6 ? 45 : 75;
+    if (totalTime + qTime > timeSeconds && limited.length > 0) break;
+    limited.push(item);
+    totalTime += qTime;
+  }
+  
+  return limited.length > 0 ? limited : items.slice(0, 10); // fallback
+}
+
+// Timer Logic
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    updateTimerDisplay();
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      finishQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const min = Math.floor(timeRemaining / 60);
+  const sec = timeRemaining % 60;
+  const display = `⏱ ${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  timerBadge.textContent = display;
+  
+  const pct = timeRemaining / (config.timeMinutes * 60);
+  timerBar.style.width = (pct * 100) + '%';
+  
+  if (pct < 0.1) {
+    timerBadge.classList.add('low');
+    timerBar.classList.add('low');
+  }
+}
+
+// Rendering Logic
+
+function renderQuestion(index) {
+  const item = items[index];
+  const q = item.questionData;
+  
+  // Update progress
+  progressBar.style.width = `${((index) / items.length) * 100}%`;
+  questionCounter.textContent = `Question ${index + 1} / ${items.length}`;
+  
+  // Part badge
+  questionPartBadge.textContent = `Part ${q.part}`;
+  questionThemeBadge.textContent = (THEMES && THEMES[q.theme]?.label) || q.theme;
+  
+  // Passage
+  if (item.passageText) {
+    passageContainer.classList.remove('hidden');
+    passageTitle.textContent = item.passageTitle || 'Reading Passage';
+    
+    // For Part 6: highlight current blank in passage text
+    let passageHtml = item.passageText;
+    if (q.part === 6) {
+      // Highlight current blank using simple string replace (avoids regex escaping issues)
+      if (q.blank) {
+        const placeholder = '[' + q.blank + ']';
+        const highlighted = '<mark style="background:rgba(139,92,246,0.35); color:var(--accent-violet-light); padding:2px 6px; border-radius:4px; font-weight:600;">[' + q.blank + ']</mark>';
+        passageHtml = passageHtml.split(placeholder).join(highlighted);
+      }
+    }
+    passageTextEl.innerHTML = passageHtml.replace(/\n|\\n/g, '<br>');
+  } else {
+    passageContainer.classList.add('hidden');
+  }
+  
+  // Question text
+  questionText.innerHTML = q.question;
+  
+  // Options
+  optionsGrid.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-prefix">${labels[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => selectAnswer(i));
+    optionsGrid.appendChild(btn);
+  });
+  
+  // Reset state
+  explanationBox.classList.remove('visible', 'is-correct', 'is-wrong');
+  btnNext.disabled = (config.mode === 'toeic') ? false : true; // In TOEIC mode: can move next without answering
+  
+  // Show prev button in custom mode
+  btnPrev.style.display = (config.mode === 'custom' && index > 0) ? 'block' : 'none';
+  
+  // Show finish button on last question
+  if (index === items.length - 1) {
+    btnNext.style.display = 'none';
+    btnSkip.style.display = 'none';
+    finishContainer.style.display = 'block';
+  } else {
+    btnNext.style.display = 'block';
+    btnSkip.style.display = 'block';
+    finishContainer.style.display = 'none';
+  }
+  
+  // Animate card
+  quizCard.classList.remove('animate-fade-in');
+  void quizCard.offsetWidth; // trigger reflow
+  quizCard.classList.add('animate-fade-in');
+  
+  // Restore previous answer if already answered (when navigating back)
+  const prevAns = userAnswers[index];
+  if (prevAns && prevAns.userAnswer !== -1 && prevAns.userAnswer !== undefined) {
+    const options = optionsGrid.querySelectorAll('.option');
+    options.forEach(opt => opt.disabled = true);
+    
+    if (config.mode === 'custom') {
+      options[prevAns.userAnswer]?.classList.add(prevAns.correct ? 'correct' : 'wrong');
+      if (!prevAns.correct) options[q.answer]?.classList.add('reveal-correct');
+      explanationBox.classList.add('visible');
+      explanationBox.classList.add(prevAns.correct ? 'is-correct' : 'is-wrong');
+      explanationResult.textContent = prevAns.correct ? '✅ Correct!' : '❌ Incorrect';
+      explanationText.innerHTML = q.explanation;
+    } else {
+      options[prevAns.userAnswer]?.classList.add('selected');
+    }
+    btnNext.disabled = false;
+  }
+}
+
+// Actions
+
+function selectAnswer(optionIndex) {
+  const item = items[currentIndex];
+  const q = item.questionData;
+  const correct = optionIndex === q.answer;
+  
+  // Save answer
+  userAnswers[currentIndex] = {
+    questionId: q.id, userAnswer: optionIndex, correct,
+    theme: q.theme, subtopic: q.subtopic, part: q.part
+  };
+  
+  // Visual feedback
+  const options = optionsGrid.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.disabled = true;
+    if (config.mode === 'custom') {
+      if (i === optionIndex && correct) opt.classList.add('correct');
+      else if (i === optionIndex && !correct) opt.classList.add('wrong');
+      if (!correct && i === q.answer) opt.classList.add('reveal-correct');
+    } else {
+      if (i === optionIndex) opt.classList.add('selected');
+    }
+  });
+  
+  // Show explanation (Custom mode only)
+  if (config.mode === 'custom') {
+    explanationBox.classList.add('visible');
+    explanationBox.classList.add(correct ? 'is-correct' : 'is-wrong');
+    explanationResult.textContent = correct ? '✅ Correct!' : '❌ Incorrect';
+    explanationText.innerHTML = q.explanation;
+  }
+  
+  btnNext.disabled = false;
+}
+
+function skipAnswer() {
+  const item = items[currentIndex];
+  const q = item.questionData;
+  userAnswers[currentIndex] = {
+    questionId: q.id, userAnswer: -1, correct: false,
+    theme: q.theme, subtopic: q.subtopic, part: q.part
+  };
+  goNext();
+}
+
+function goNext() {
+  if (currentIndex < items.length - 1) {
+    currentIndex++;
+    renderQuestion(currentIndex);
+  }
+}
+
+function goPrev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion(currentIndex);
+  }
+}
+
+function finishQuiz() {
+  clearInterval(timerInterval);
+  
+  // Fill unanswered questions with -1
+  items.forEach((item, i) => {
+    if (!userAnswers[i]) {
+      userAnswers[i] = { questionId: item.questionData.id, userAnswer: -1, correct: false, theme: item.questionData.theme, subtopic: item.questionData.subtopic, part: item.questionData.part };
+    }
+  });
+  
+  const answeredCount = userAnswers.filter(a => a.userAnswer !== -1).length;
+  const correctCount = userAnswers.filter(a => a.correct).length;
+  const score = items.length > 0 ? Math.round((correctCount / items.length) * 100) : 0;
+  
+  const session = {
+    id: Date.now().toString(),
+    date: new Date().toISOString(),
+    mode: config.mode,
+    durationMinutes: config.timeMinutes,
+    actualDurationSeconds: (config.timeMinutes * 60) - timeRemaining,
+    score,
+    totalQ: items.length,
+    correctQ: correctCount,
+    parts: config.parts,
+    themes: config.themes,
+    subtopics: config.subtopics,
+    results: userAnswers
+  };
+  
+  saveSession(session);
+  sessionStorage.setItem('toeic_last_session_id', session.id);
+  window.location.href = 'results.html';
+}

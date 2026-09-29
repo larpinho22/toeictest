@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Dashboard | TOEIC Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-dark">
+    <nav class="navbar flex-between">
+        <div class="nav-logo">TOEIC<span>Master</span></div>
+        <div class="flex-center" style="gap: 1rem;">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="progress.html" class="nav-link">Progress</a>
+            <div class="user-chip flex-center">
+                <div class="user-avatar">?</div>
+                <span id="nav-username">User</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 96px; padding-bottom: 4rem;">
+        <section class="flex-between mb-8 animate-slide-up">
+            <h1 class="text-gradient m-0">Your Progress</h1>
+            <div class="streak-widget">
+                <span class="streak-fire">🔥</span>
+                <span><span id="streak-count">0</span> Day Streak</span>
+            </div>
+        </section>
+
+        <!-- Section 1: GLOBAL STATS -->
+        <section class="grid-4 mb-8 animate-slide-up" style="animation-delay: 0.1s">
+            <div class="stat-card">
+                <div class="stat-label">Total Sessions</div>
+                <div class="stat-value" id="stat-sessions">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value" id="stat-avg-score">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Best Score</div>
+                <div class="stat-value" id="stat-best-score">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Questions Answered</div>
+                <div class="stat-value" id="stat-total-q">0</div>
+            </div>
+        </section>
+
+        <!-- Section 2: CHARTS -->
+        <section class="grid-2 mb-8 animate-slide-up" style="animation-delay: 0.2s">
+            <div class="card">
+                <h3 class="mb-4">Score Trend</h3>
+                <div style="height: 300px; width: 100%; position: relative;">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
+            <div class="card flex-center flex-column">
+                <h3 class="mb-4" style="align-self: flex-start;">Theme Performance</h3>
+                <div class="radar-container" style="width: 100%; aspect-ratio: 1; max-width: 300px; max-height: 300px;">
+                    <canvas id="radar-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: THEME PERFORMANCE TABLE -->
+        <section class="card mb-8 animate-slide-up" style="animation-delay: 0.3s">
+            <h3 class="mb-4">Performance by Theme</h3>
+            <div id="theme-stats-container">
+                <!-- Theme stats rows injected here -->
+            </div>
+        </section>
+
+        <!-- Section 4: SESSION HISTORY -->
+        <section class="card mb-8 animate-slide-up" style="animation-delay: 0.4s">
+            <div class="flex-between mb-4">
+                <h3 class="m-0">Session History</h3>
+                <button id="btn-reset" class="btn btn-danger btn-sm">Reset All</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="session-table" style="width: 100%; text-align: left; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th class="p-2 text-muted">Date</th>
+                            <th class="p-2 text-muted">Mode</th>
+                            <th class="p-2 text-muted">Parts</th>
+                            <th class="p-2 text-muted">Score</th>
+                            <th class="p-2 text-muted">Time</th>
+                            <th class="p-2 text-muted">Questions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="session-tbody">
+                        <!-- Rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="history-empty" class="empty-state hidden p-8 text-center text-muted">
+                <div class="empty-state-icon text-4xl mb-4">📚</div>
+                <p>No sessions yet. Start your first training!</p>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/progress.js"></script>
+</body>
+</html>
