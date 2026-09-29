@@ -309,6 +309,138 @@ function validateAnswer(userInput, validAnswers, moduleId) {
   return { isCorrect: false };
 }
 
+function diagnoseError(userInput, q) {
+  const normUser = normalize(userInput);
+  const userLower = (userInput || '').toLowerCase().trim();
+  const qId = q.id;
+  const mod = q.moduleId;
+
+  // 1. Specific Question Diagnostics (high priority exact traps)
+  if (qId === 'ts_010') {
+    if (userLower.includes('have') || userLower.includes('has')) {
+      return `Tu as utilisé le <strong>Present Perfect</strong> (<em>"${userInput}"</em>). Or, le marqueur <strong>"these days"</strong> (ces temps-ci) et l'adverbe <strong>"continuously"</strong> décrivent une <strong>tendance en pleine évolution en ce moment</strong>. En anglais, une situation qui évolue actuellement nécessite le <strong>Present Continuous</strong> (<em>are increasing</em>), et non le Present Perfect.`;
+    }
+    if (userLower.includes('increased')) {
+      return `Tu as utilisé le <strong>Past Simple</strong> (<em>"${userInput}"</em>). Or, <strong>"these days"</strong> (ces jours-ci) ne fait pas référence au passé, mais à la période actuelle en cours : il faut donc le <strong>Present Continuous</strong> (<em>are increasing</em>).`;
+    }
+  }
+
+  if (qId === 'ts_005') {
+    if (userLower.includes('have') || userLower.includes('has')) {
+      return `Tu as utilisé le <strong>Present Perfect</strong> (<em>"${userInput}"</em>). Or, la phrase précise <strong>"In 2022"</strong> : c'est une <strong>date passée précise et terminée</strong>. En anglais, il est strictement interdit d'utiliser le Present Perfect avec une date passée précise. Il faut obligatoirement utiliser le <strong>Past Simple</strong> (<em>installed</em>).`;
+    }
+    if (userLower.includes('installing')) {
+      return `Tu as utilisé une forme continue, mais <strong>"In 2022"</strong> indique un événement ponctuel terminé dans le passé : il faut le <strong>Past Simple</strong> (<em>installed</em>).`;
+    }
+  }
+
+  if (qId === 'ts_002') {
+    if (userLower.includes('have') || userLower.includes('has')) {
+      return `Tu as utilisé le <strong>Present Perfect</strong> (<em>"${userInput}"</em>). Or, la phrase contient le marqueur <strong>"yesterday"</strong> (hier). Une action passée datée exige obligatoirement le <strong>Past Simple</strong> (<em>submitted</em>).`;
+    }
+  }
+
+  if (qId === 'ts_009') {
+    if (userLower.includes('have') || userLower.includes('has')) {
+      return `Tu as utilisé le <strong>Present Perfect</strong> (<em>"${userInput}"</em>). Or, le marqueur <strong>"Two weeks ago"</strong> (il y a deux semaines) exprime un moment révolu dans le passé : il faut le <strong>Past Simple</strong> (<em>repaired</em>).`;
+    }
+  }
+
+  if (qId === 'ts_001') {
+    if (!userLower.includes('is') && !userLower.includes('are') && userLower.includes('rise')) {
+      return `Tu as mis du Present Simple (<em>"${userInput}"</em>). Or, <strong>"Look!"</strong> et <strong>"right now"</strong> indiquent une action en train de se produire sous nos yeux à cet instant précis : il faut utiliser le <strong>Present Continuous</strong> (<em>be + V-ing</em> → <em>is rising</em>).`;
+    }
+  }
+
+  if (qId === 'ts_006') {
+    if (!userLower.includes('has') && !userLower.includes('have')) {
+      return `Tu as utilisé le <strong>Past Simple</strong> (<em>"${userInput}"</em>). Or, le marqueur <strong>"since last September"</strong> (depuis septembre dernier) indique une action qui a commencé dans le passé et <strong>qui continue aujourd'hui</strong>. En anglais, cette notion de continuité jusqu'au présent exige le <strong>Present Perfect</strong> (<em>has worked</em>).`;
+    }
+  }
+
+  if (qId === 'ts_003') {
+    if (!userLower.includes('have') && !userLower.includes('has')) {
+      return `Tu as utilisé le <strong>Past Simple</strong> (<em>"${userInput}"</em>). Or, l'adverbe <strong>"already"</strong> (déjà) fait un bilan dans la période en cours ("this week") : il faut le <strong>Present Perfect</strong> (<em>have already tested</em>).`;
+    }
+  }
+
+  if (qId === 'ts_007') {
+    if (!userLower.includes('is') && !userLower.includes('are')) {
+      return `Tu n'as pas utilisé la forme continue. Le marqueur <strong>"At the moment"</strong> (en ce moment) indique une activité temporaire en cours : il faut le <strong>Present Continuous</strong> (<em>is developing</em>).`;
+    }
+  }
+
+  if (qId === 'cv_002') {
+    if (userLower.includes('mention')) {
+      return `Attention au faux-ami : <em>"mention"</em> ne se traduit pas par "mention" sur un CV anglophone ! L'équivalent officiel est <strong>"with honours"</strong> (UK) ou <strong>"with distinction"</strong>.`;
+    }
+  }
+
+  if (qId === 'cv_001') {
+    if (userLower.includes('bac')) {
+      return `Attention : le diplôme du <em>Baccalauréat</em> ne se traduit pas par "baccalaureate" en anglais professionnel courant, mais par <strong>"A-levels"</strong> (au Royaume-Uni) ou <strong>"High school diploma"</strong> (aux USA).`;
+    }
+  }
+
+  if (qId === 'cv_006') {
+    if (userLower.includes('training') || userLower.includes('formation')) {
+      return `Attention au faux-ami : un stage en entreprise se traduit par <strong>"internship"</strong> (US) ou <strong>"work placement"</strong> (UK). <em>"Training"</em> désigne une formation technique ou un entraînement, pas un poste de stagiaire.`;
+    }
+  }
+
+  if (qId === 'cv_010' && userLower.includes('proficient')) {
+    return `Attention : <em>"proficient"</em> signifie <strong>très bien maîtriser</strong>. Pour exprimer <strong>avoir les bases / des notions</strong>, on emploie l'expression <strong>"working knowledge of"</strong>.`;
+  }
+
+  if (qId === 'cv_011' && userLower.includes('working')) {
+    return `Attention : <em>"working knowledge"</em> signifie seulement <strong>avoir les bases</strong>. Pour exprimer le fait de <strong>très bien maîtriser</strong> un logiciel, on emploie <strong>"proficient with"</strong>.`;
+  }
+
+  if (qId === 'wr_003' && userLower.includes('faithfully')) {
+    return `Tu as confondu les formules de politesse : comme la lettre s'adresse à une personne nommée (<em>"Dear Mr. Smith"</em>), il faut obligatoirement conclure par <strong>"Yours sincerely"</strong>. <em>"Yours faithfully"</em> n'est utilisé que lorsque tu ne connais pas le nom (<em>"Dear Sir or Madam"</em>).`;
+  }
+
+  if (qId === 'wr_004' && userLower.includes('sincerely')) {
+    return `Tu as confondu les formules de politesse : lorsque la lettre commence par <em>"Dear Sir or Madam"</em> (destinataire inconnu), la formule officielle britannique est <strong>"Yours faithfully"</strong>. <em>"Yours sincerely"</em> est réservé aux destinataires nommés.`;
+  }
+
+  if (mod === 'passive') {
+    if (!userLower.includes('be') && !userLower.includes('is') && !userLower.includes('are') && !userLower.includes('was') && !userLower.includes('were') && !userLower.includes('been') && !userLower.includes('being')) {
+      return `Tu as oublié l'auxiliaire <strong>BE</strong> ! Pour former la voix passive en anglais, la structure est obligatoirement : <strong>Sujet + BE (au bon temps) + Participe Passé</strong>.`;
+    }
+    if (qId === 'pv_002' && !userLower.includes('being')) {
+      return `Attention au temps : la phrase active est au Present Continuous (<em>are monitoring</em>). À la voix passive, il ne faut pas oublier <strong>BEING</strong> → <em>are <strong>being</strong> monitored</em>.`;
+    }
+    if (qId === 'pv_003' && !userLower.includes('been')) {
+      return `Attention au temps : la phrase active est au Present Perfect (<em>have installed</em>). À la voix passive, il faut insérer <strong>BEEN</strong> → <em>have <strong>been</strong> installed</em>.`;
+    }
+  }
+
+  // 2. Generic heuristics for tenses
+  if (mod === 'tenses') {
+    const userWords = normUser.split(' ');
+    const hasHaveHas = userWords.some(w => w === 'have' || w === 'has');
+    const hasBe = userWords.some(w => w === 'is' || w === 'are' || w === 'am' || w === 'was' || w === 'were');
+    const targetHasHave = q.answers.some(a => a.includes('have') || a.includes('has'));
+    const targetHasBe = q.answers.some(a => a.includes('is') || a.includes('are') || a.includes('am') || a.includes('was') || a.includes('were'));
+
+    if (hasHaveHas && !targetHasHave) {
+      return `Tu as utilisé le <strong>Present Perfect</strong> (<em>"${userInput}"</em>). Or, cette phrase n'exprime pas un bilan ou une action liée au présent : regarde bien les marqueurs temporels dans l'énoncé.`;
+    }
+    if (!hasHaveHas && targetHasHave) {
+      return `Tu n'as pas utilisé le <strong>Present Perfect</strong>. Les marqueurs de bilan ou de continuité (comme <em>since</em>, <em>for</em>, <em>already</em>, <em>yet</em>) exigent <strong>have/has + participe passé</strong>.`;
+    }
+    if (hasBe && !targetHasBe) {
+      return `Tu as utilisé une forme continue (<em>"${userInput}"</em>). Or, cette phrase nécessite une action simple terminée ou habituelle, et non une action temporaire en cours.`;
+    }
+    if (!hasBe && targetHasBe) {
+      return `Tu as oublié la forme continue (<em>be + V-ing</em>). L'énoncé indique une action se déroulant en ce moment ou une tendance actuelle.`;
+    }
+  }
+
+  return null;
+}
+
 function submitAnswer() {
   if (hasAnsweredCurrent) {
     nextQuestion();
@@ -326,12 +458,14 @@ function submitAnswer() {
   const q = quizQuestions[currentIndex];
   const evalResult = validateAnswer(rawInput, q.answers, q.moduleId);
   const isCorrect = evalResult.isCorrect;
+  const diagnostic = !isCorrect ? diagnoseError(rawInput, q) : null;
 
   userAnswers[currentIndex] = {
     question: q,
     userInput: rawInput,
     isCorrect,
-    evalResult
+    evalResult,
+    diagnostic
   };
 
   input.disabled = true;
@@ -343,12 +477,14 @@ function submitAnswer() {
   const banner = document.getElementById('feedback-banner');
   const header = document.getElementById('feedback-header');
   const expected = document.getElementById('feedback-expected');
+  const diagEl = document.getElementById('feedback-diagnostic');
   const explanation = document.getElementById('feedback-explanation');
 
   feedbackContainer.classList.remove('hidden');
   banner.className = `feedback-banner ${isCorrect ? 'correct' : 'incorrect'}`;
 
   if (isCorrect) {
+    if (diagEl) diagEl.classList.add('hidden');
     if (evalResult.type === 'exact') {
       header.innerHTML = '🎉 Exactement ! Excellente réponse.';
       header.style.color = '#10b981';
@@ -370,6 +506,15 @@ function submitAnswer() {
     header.innerHTML = '❌ Pas tout à fait.';
     header.style.color = '#ef4444';
     expected.innerHTML = `<strong>Réponse attendue :</strong> <span style="color:#10b981; font-weight:700;">${q.answers[0]}</span>`;
+
+    if (diagEl) {
+      if (diagnostic) {
+        diagEl.innerHTML = `<strong>🔎 Pourquoi ta réponse ("${rawInput}") est fausse :</strong><br>${diagnostic}`;
+        diagEl.classList.remove('hidden');
+      } else {
+        diagEl.classList.add('hidden');
+      }
+    }
   }
 
   explanation.innerHTML = `<strong>💡 Règle / Explication :</strong> ${q.explanation}`;
@@ -471,6 +616,13 @@ function finishExam() {
     item.style.borderLeft = ans.isCorrect ? '4px solid #10b981' : '4px solid #ef4444';
     item.style.padding = '1.25rem 1.5rem';
 
+    const diag = !ans.isCorrect ? diagnoseError(ans.userInput, ans.question) : null;
+    const diagHtml = diag ? `
+      <div style="font-size:0.9rem; color:#fed7aa; background:rgba(245, 158, 11, 0.12); padding:0.75rem 1rem; border-radius:6px; border-left:3px solid #f59e0b; margin-bottom:0.75rem; line-height:1.55;">
+        <strong style="color:#fbbf24;">🔎 Pourquoi ta réponse était fausse :</strong><br>${diag}
+      </div>
+    ` : '';
+
     item.innerHTML = `
       <div class="flex-between mb-2" style="flex-wrap:wrap; gap:0.5rem;">
         <span style="font-weight:700; color:#cbd5e1; font-size:0.85rem;">Question ${idx + 1}</span>
@@ -491,6 +643,7 @@ function finishExam() {
           <div style="font-weight:600; color:#10b981; font-size:0.95rem;">${ans.question.answers[0]}</div>
         </div>
       </div>
+      ${diagHtml}
       <div style="font-size:0.9rem; color:#cbd5e1; background:rgba(255,255,255,0.03); padding:0.75rem 1rem; border-radius:6px;">
         💡 ${ans.question.explanation}
       </div>
