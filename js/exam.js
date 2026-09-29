@@ -184,6 +184,19 @@ function cleanParticles(str) {
     .trim();
 }
 
+function getPassiveTense(str) {
+  const norm = (str || '').toLowerCase();
+  if (norm.includes('have been') || norm.includes('has been')) return 'perfect-passive';
+  if (norm.includes('being')) return 'continuous-passive';
+  if (norm.includes('will be')) return 'future-passive';
+  if (norm.includes('must be')) return 'must-passive';
+  if (norm.includes('can be')) return 'can-passive';
+  if (norm.includes('should be')) return 'should-passive';
+  if (norm.includes('was ') || norm.includes('were ') || norm.endsWith(' was') || norm.endsWith(' were')) return 'past-passive';
+  if (norm.includes('is ') || norm.includes('are ') || norm.endsWith(' is') || norm.endsWith(' are')) return 'present-passive';
+  return 'unknown';
+}
+
 function validateAnswer(userInput, validAnswers, moduleId) {
   const normUser = normalize(userInput);
   if (!normUser) return { isCorrect: false };
@@ -302,6 +315,16 @@ function validateAnswer(userInput, validAnswers, moduleId) {
   for (const ans of validAnswers) {
     const normAns = normalize(ans);
     if (normAns.split(' ').length >= 5) {
+      // In passive voice, the auxiliary / passive tense MUST match the target!
+      if (moduleId === 'passive') {
+        const targetPassiveTense = getPassiveTense(normAns);
+        const userPassiveTense = getPassiveTense(normUser);
+        if (targetPassiveTense !== 'unknown' && targetPassiveTense !== userPassiveTense) {
+          // Tense mismatch in passive voice is a grammatical error, reject similarity
+          continue;
+        }
+      }
+
       const uWords = normUser.split(' ');
       const aWords = normAns.split(' ');
       const matchWords = uWords.filter(w => aWords.includes(w));
@@ -418,14 +441,40 @@ function diagnoseError(userInput, q) {
   }
 
   if (mod === 'passive') {
+    const targetLower = (q.answers[0] || '').toLowerCase();
+    const targetPassiveTense = getPassiveTense(targetLower);
+    const userPassiveTense = getPassiveTense(userLower);
+
     if (!userLower.includes('be') && !userLower.includes('is') && !userLower.includes('are') && !userLower.includes('was') && !userLower.includes('were') && !userLower.includes('been') && !userLower.includes('being')) {
       return `Tu as oublié l'auxiliaire <strong>BE</strong> ! Pour former la voix passive en anglais, la structure est obligatoirement : <strong>Sujet + BE (au bon temps) + Participe Passé</strong>.`;
     }
-    if (qId === 'pv_002' && !userLower.includes('being')) {
-      return `Attention au temps : la phrase active est au Present Continuous (<em>are monitoring</em>). À la voix passive, il ne faut pas oublier <strong>BEING</strong> → <em>are <strong>being</strong> monitored</em>.`;
+
+    if (targetPassiveTense === 'perfect-passive' && userPassiveTense !== 'perfect-passive') {
+      return `Attention au temps : la phrase active est au <strong>Present Perfect</strong> (<em>have/has + participe passé</em>). À la voix passive, le temps d'origine doit être rigoureusement conservé : il faut employer <strong>have been / has been</strong> + participe passé (et non le Past Simple <em>was/were</em>).`;
     }
-    if (qId === 'pv_003' && !userLower.includes('been')) {
-      return `Attention au temps : la phrase active est au Present Perfect (<em>have installed</em>). À la voix passive, il faut insérer <strong>BEEN</strong> → <em>have <strong>been</strong> installed</em>.`;
+
+    if (targetPassiveTense === 'continuous-passive' && userPassiveTense !== 'continuous-passive') {
+      return `Attention au temps : la phrase active est au <strong>Present Continuous</strong> (<em>be + V-ing</em>). À la voix passive, il ne faut pas oublier <strong>BEING</strong> (<strong>is/are being</strong> + participe passé).`;
+    }
+
+    if (targetPassiveTense === 'past-passive' && userPassiveTense !== 'past-passive') {
+      return `Attention au temps : la phrase active est au <strong>Past Simple</strong>. À la voix passive, BE doit être au Past Simple (<strong>was / were</strong> + participe passé), et non au Present Perfect.`;
+    }
+
+    if (targetPassiveTense === 'future-passive' && userPassiveTense !== 'future-passive') {
+      return `Attention au temps : la phrase active est au futur (<em>will</em>). À la voix passive, utilise <strong>will be</strong> + participe passé.`;
+    }
+
+    if (targetLower.includes('must be') && !userLower.includes('must be')) {
+      return `Attention au modal : la phrase active contient <em>must</em>. À la voix passive, utilise <strong>must be</strong> + participe passé.`;
+    }
+
+    if (targetLower.includes('can be') && !userLower.includes('can be')) {
+      return `Attention au modal : la phrase active contient <em>can</em>. À la voix passive, utilise <strong>can be</strong> + participe passé.`;
+    }
+
+    if (targetLower.includes('should be') && !userLower.includes('should be')) {
+      return `Attention au modal : la phrase active contient <em>should</em>. À la voix passive, utilise <strong>should be</strong> + participe passé.`;
     }
   }
 
