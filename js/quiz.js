@@ -29,6 +29,8 @@ let config = null;
 let items = [];
 let currentIndex = 0;
 const userAnswers = []; // array of {questionId, userAnswer, correct, theme, subtopic, part}
+let pendingOption = null;
+const questionConfirmed = [];
 let timeRemaining = 0; // seconds
 let timerInterval = null;
 
@@ -63,7 +65,7 @@ function init() {
     timeRemaining = config.timeMinutes * 60;
     
     // Event listeners
-    btnNext.addEventListener('click', goNext);
+    btnNext.addEventListener('click', handleNextClick);
     btnPrev.addEventListener('click', goPrev);
     btnSkip.addEventListener('click', skipAnswer);
     btnFinish.addEventListener('click', finishQuiz);
@@ -243,107 +245,225 @@ function renderQuestion(index) {
   // Options
   optionsGrid.innerHTML = '';
   const labels = ['A', 'B', 'C', 'D'];
+  const isConfirmed = !!questionConfirmed[index];
+  const isLast = (index === items.length - 1);
+  
   q.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option';
     btn.innerHTML = `<span class="option-prefix">${labels[i]}</span><span>${opt}</span>`;
-    btn.addEventListener('click', () => selectAnswer(i));
+    
+    if (config.mode === 'toeic') {
+      if (userAnswers[index]?.userAnswer === i) {
+        btn.classList.add('selected');
+      }
+      btn.addEventListener('click', () => toggleOptionToeic(i));
+    } else {
+      // Custom mode
+      if (isConfirmed) {
+        btn.disabled = true;
+        const ans = userAnswers[index];
+        if (ans && ans.userAnswer === i) {
+          btn.classList.add(ans.correct ? 'correct' : 'wrong');
+        }
+        if (ans && !ans.correct && i === q.answer) {
+          btn.classList.add('reveal-correct');
+        }
+      } else {
+        if (pendingOption === i) {
+          btn.classList.add('selected');
+        }
+        btn.addEventListener('click', () => toggleOptionCustom(i));
+      }
+    }
     optionsGrid.appendChild(btn);
   });
   
-  // Reset state
-  explanationBox.classList.remove('visible', 'is-correct', 'is-wrong');
-  btnNext.disabled = (config.mode === 'toeic') ? false : true; // In TOEIC mode: can move next without answering
-  
-  // Show prev button in custom mode
-  btnPrev.style.display = (config.mode === 'custom' && index > 0) ? 'block' : 'none';
-  
-  // Show finish button on last question
-  if (index === items.length - 1) {
-    btnNext.style.display = 'none';
-    btnSkip.style.display = 'none';
-    finishContainer.style.display = 'block';
+  // Explanation & Buttons
+  if (config.mode === 'toeic') {
+    explanationBox.classList.remove('visible', 'is-correct', 'is-wrong');
+    btnNext.disabled = false;
+    btnNext.textContent = isLast ? 'Finish & See Results 🎯' : 'Next →';
+    btnPrev.style.display = index > 0 ? 'block' : 'none';
   } else {
-    btnNext.style.display = 'block';
-    btnSkip.style.display = 'block';
-    finishContainer.style.display = 'none';
+    // Custom mode
+    btnPrev.style.display = index > 0 ? 'block' : 'none';
+    if (isConfirmed) {
+      const ans = userAnswers[index];
+      explanationBox.classList.add('visible');
+      explanationBox.classList.remove('is-correct', 'is-wrong');
+      explanationBox.classList.add(ans && ans.correct ? 'is-correct' : 'is-wrong');
+      explanationResult.textContent = ans && ans.userAnswer === -1 ? '⏭ Skipped' : (ans && ans.correct ? '✅ Correct!' : '❌ Incorrect');
+      explanationText.innerHTML = q.explanation;
+      btnNext.disabled = false;
+      btnNext.textContent = isLast ? 'Finish & See Results 🎯' : 'Next Question →';
+    } else {
+      explanationBox.classList.remove('visible', 'is-correct', 'is-wrong');
+      btnNext.disabled = (pendingOption === null);
+      btnNext.textContent = 'Check Answer ✓';
+    }
   }
+  
+  // Hide separate finish container since btnNext handles finishing
+  finishContainer.style.display = 'none';
+  btnNext.style.display = 'block';
+  btnSkip.style.display = 'block';
   
   // Animate card
   quizCard.classList.remove('animate-fade-in');
   void quizCard.offsetWidth; // trigger reflow
   quizCard.classList.add('animate-fade-in');
+}
+
+// Option Interaction Logic
+
+function toggleOptionToeic(optionIndex) {
+  const q = items[currentIndex].questionData;
+  const options = optionsGrid.querySelectorAll('.option');
   
-  // Restore previous answer if already answered (when navigating back)
-  const prevAns = userAnswers[index];
-  if (prevAns && prevAns.userAnswer !== -1 && prevAns.userAnswer !== undefined) {
-    const options = optionsGrid.querySelectorAll('.option');
-    options.forEach(opt => opt.disabled = true);
-    
-    if (config.mode === 'custom') {
-      options[prevAns.userAnswer]?.classList.add(prevAns.correct ? 'correct' : 'wrong');
-      if (!prevAns.correct) options[q.answer]?.classList.add('reveal-correct');
-      explanationBox.classList.add('visible');
-      explanationBox.classList.add(prevAns.correct ? 'is-correct' : 'is-wrong');
-      explanationResult.textContent = prevAns.correct ? '✅ Correct!' : '❌ Incorrect';
-      explanationText.innerHTML = q.explanation;
-    } else {
-      options[prevAns.userAnswer]?.classList.add('selected');
-    }
+  if (userAnswers[currentIndex]?.userAnswer === optionIndex) {
+    // Deselect
+    delete userAnswers[currentIndex];
+    options[optionIndex].classList.remove('selected');
+  } else {
+    // Select this option
+    options.forEach(opt => opt.classList.remove('selected'));
+    options[optionIndex].classList.add('selected');
+    userAnswers[currentIndex] = {
+      questionId: q.id,
+      userAnswer: optionIndex,
+      correct: optionIndex === q.answer,
+      theme: q.theme,
+      subtopic: q.subtopic,
+      part: q.part
+    };
+  }
+}
+
+function toggleOptionCustom(optionIndex) {
+  if (questionConfirmed[currentIndex]) return;
+  const options = optionsGrid.querySelectorAll('.option');
+  
+  if (pendingOption === optionIndex) {
+    // Deselect!
+    pendingOption = null;
+    options[optionIndex].classList.remove('selected');
+    btnNext.disabled = true;
+  } else {
+    // Select option
+    options.forEach(opt => opt.classList.remove('selected'));
+    options[optionIndex].classList.add('selected');
+    pendingOption = optionIndex;
     btnNext.disabled = false;
   }
 }
 
-// Actions
-
-function selectAnswer(optionIndex) {
-  const item = items[currentIndex];
-  const q = item.questionData;
-  const correct = optionIndex === q.answer;
+function confirmCustomAnswer() {
+  if (pendingOption === null) return;
+  const q = items[currentIndex].questionData;
+  const correct = pendingOption === q.answer;
+  const isLast = (currentIndex === items.length - 1);
   
-  // Save answer
   userAnswers[currentIndex] = {
-    questionId: q.id, userAnswer: optionIndex, correct,
-    theme: q.theme, subtopic: q.subtopic, part: q.part
+    questionId: q.id,
+    userAnswer: pendingOption,
+    correct,
+    theme: q.theme,
+    subtopic: q.subtopic,
+    part: q.part
   };
+  questionConfirmed[currentIndex] = true;
   
   // Visual feedback
   const options = optionsGrid.querySelectorAll('.option');
   options.forEach((opt, i) => {
     opt.disabled = true;
-    if (config.mode === 'custom') {
-      if (i === optionIndex && correct) opt.classList.add('correct');
-      else if (i === optionIndex && !correct) opt.classList.add('wrong');
-      if (!correct && i === q.answer) opt.classList.add('reveal-correct');
-    } else {
-      if (i === optionIndex) opt.classList.add('selected');
+    if (i === pendingOption) {
+      opt.classList.remove('selected');
+      opt.classList.add(correct ? 'correct' : 'wrong');
+    }
+    if (!correct && i === q.answer) {
+      opt.classList.add('reveal-correct');
     }
   });
   
-  // Show explanation (Custom mode only)
-  if (config.mode === 'custom') {
-    explanationBox.classList.add('visible');
-    explanationBox.classList.add(correct ? 'is-correct' : 'is-wrong');
-    explanationResult.textContent = correct ? '✅ Correct!' : '❌ Incorrect';
-    explanationText.innerHTML = q.explanation;
-  }
+  // Show explanation
+  explanationBox.classList.add('visible');
+  explanationBox.classList.remove('is-correct', 'is-wrong');
+  explanationBox.classList.add(correct ? 'is-correct' : 'is-wrong');
+  explanationResult.textContent = correct ? '✅ Correct!' : '❌ Incorrect';
+  explanationText.innerHTML = q.explanation;
   
+  // Transition button to Next
   btnNext.disabled = false;
+  btnNext.textContent = isLast ? 'Finish & See Results 🎯' : 'Next Question →';
+}
+
+function handleNextClick() {
+  const isLast = (currentIndex === items.length - 1);
+  
+  if (config.mode === 'toeic') {
+    if (isLast) finishQuiz();
+    else goNext();
+  } else {
+    // Custom mode
+    if (!questionConfirmed[currentIndex]) {
+      confirmCustomAnswer();
+    } else {
+      if (isLast) finishQuiz();
+      else goNext();
+    }
+  }
 }
 
 function skipAnswer() {
-  const item = items[currentIndex];
-  const q = item.questionData;
-  userAnswers[currentIndex] = {
-    questionId: q.id, userAnswer: -1, correct: false,
-    theme: q.theme, subtopic: q.subtopic, part: q.part
-  };
-  goNext();
+  const q = items[currentIndex].questionData;
+  const isLast = (currentIndex === items.length - 1);
+  
+  if (config.mode === 'toeic') {
+    userAnswers[currentIndex] = {
+      questionId: q.id,
+      userAnswer: -1,
+      correct: false,
+      theme: q.theme,
+      subtopic: q.subtopic,
+      part: q.part
+    };
+    if (isLast) finishQuiz();
+    else goNext();
+  } else {
+    // In Custom mode: show explanation for the skipped question
+    userAnswers[currentIndex] = {
+      questionId: q.id,
+      userAnswer: -1,
+      correct: false,
+      theme: q.theme,
+      subtopic: q.subtopic,
+      part: q.part
+    };
+    questionConfirmed[currentIndex] = true;
+    
+    const options = optionsGrid.querySelectorAll('.option');
+    options.forEach((opt, i) => {
+      opt.disabled = true;
+      if (i === q.answer) opt.classList.add('reveal-correct');
+    });
+    
+    explanationBox.classList.add('visible');
+    explanationBox.classList.remove('is-correct', 'is-wrong');
+    explanationBox.classList.add('is-wrong');
+    explanationResult.textContent = '⏭ Skipped';
+    explanationText.innerHTML = q.explanation;
+    
+    btnNext.disabled = false;
+    btnNext.textContent = isLast ? 'Finish & See Results 🎯' : 'Next Question →';
+  }
 }
 
 function goNext() {
   if (currentIndex < items.length - 1) {
     currentIndex++;
+    pendingOption = null;
     renderQuestion(currentIndex);
   }
 }
@@ -351,6 +471,7 @@ function goNext() {
 function goPrev() {
   if (currentIndex > 0) {
     currentIndex--;
+    pendingOption = null;
     renderQuestion(currentIndex);
   }
 }
