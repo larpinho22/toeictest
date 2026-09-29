@@ -165,6 +165,8 @@ function normalize(str) {
     .trim();
 }
 
+const TENSE_AUXILIARIES = new Set(['have', 'has', 'had', 'is', 'are', 'am', 'was', 'were', 'will', 'be', 'been', 'being']);
+
 function cleanParticles(str) {
   return str
     .replace(/^(to|the|a|an)\s+/i, '')
@@ -173,7 +175,7 @@ function cleanParticles(str) {
     .trim();
 }
 
-function validateAnswer(userInput, validAnswers) {
+function validateAnswer(userInput, validAnswers, moduleId) {
   const normUser = normalize(userInput);
   if (!normUser) return { isCorrect: false };
 
@@ -185,7 +187,47 @@ function validateAnswer(userInput, validAnswers) {
     }
   }
 
-  // 2. Preposition / particle stripped match (e.g. "apply for" vs "apply", "a-levels" vs "a-level")
+  // Handle Contractions for tenses (e.g. hasn't -> has not, didn't -> did not)
+  const expandedUser = normUser
+    .replace(/\bhasn t\b/g, 'has not')
+    .replace(/\bhaven t\b/g, 'have not')
+    .replace(/\bdidn t\b/g, 'did not')
+    .replace(/\bisn t\b/g, 'is not')
+    .replace(/\baren t\b/g, 'are not');
+
+  for (const ans of validAnswers) {
+    const normAns = normalize(ans);
+    if (expandedUser === normAns) return { isCorrect: true, matchedAnswer: ans, type: 'exact' };
+  }
+
+  // FOR TENSE DRILLS: Strict tense checking!
+  // Prepending or removing an auxiliary (have/has/had/was/is) changes the tense completely!
+  if (moduleId === 'tenses') {
+    const userWords = normUser.split(' ');
+    
+    for (const ans of validAnswers) {
+      const normAns = normalize(ans);
+      const ansWords = normAns.split(' ');
+      
+      const userAux = userWords.filter(w => TENSE_AUXILIARIES.has(w));
+      const ansAux = ansWords.filter(w => TENSE_AUXILIARIES.has(w));
+      
+      // If one has an auxiliary (e.g. "have") and the other doesn't -> DIFFERENT TENSE -> REJECT!
+      if (userAux.join(' ') !== ansAux.join(' ')) {
+        continue;
+      }
+      
+      // Allow minor spelling typo on main verb (e.g., submited vs submitted, instaled vs installed)
+      const dist = levenshtein(normUser, normAns);
+      if (dist <= 1 && normAns.length >= 5) {
+        return { isCorrect: true, matchedAnswer: ans, type: 'typo', dist };
+      }
+    }
+
+    return { isCorrect: false, reason: 'tense-mismatch' };
+  }
+
+  // 2. Preposition / particle stripped match (for non-tense questions)
   const strippedUser = cleanParticles(normUser);
   for (const ans of validAnswers) {
     const normAns = normalize(ans);
@@ -195,15 +237,20 @@ function validateAnswer(userInput, validAnswers) {
     }
   }
 
-  // 3. Subphrase & containment matching (e.g. user typed "apply for" and target is "apply", or user typed "honours" and target is "with honours")
+  // 3. Subphrase & containment matching (for non-tense questions)
   for (const ans of validAnswers) {
     const normAns = normalize(ans);
     const ansWords = normAns.split(' ');
     const userWords = normUser.split(' ');
     
+    // Check if user added an auxiliary like "have", "was" - only allow if target allows it
+    const userHasAux = userWords.some(w => TENSE_AUXILIARIES.has(w));
+    const ansHasAux = ansWords.some(w => TENSE_AUXILIARIES.has(w));
+    if (userHasAux && !ansHasAux) continue;
+
     // User input contains target keyword (e.g. user: "apply for", target: "apply")
     if (ansWords.length <= 2 && userWords.length <= 4) {
-      if (userWords.includes(normAns) || normUser.startsWith(normAns + ' ') || normUser.endsWith(' ' + normAns)) {
+      if (normUser.startsWith(normAns + ' ') || normUser.endsWith(' ' + normAns)) {
         return { isCorrect: true, matchedAnswer: ans, type: 'subphrase' };
       }
     }
@@ -231,7 +278,6 @@ function validateAnswer(userInput, validAnswers) {
       return { isCorrect: true, matchedAnswer: ans, type: 'typo', dist };
     }
 
-    // Also try fuzzy match on stripped versions
     const strippedAns = cleanParticles(normAns);
     if (strippedUser && strippedAns) {
       const strippedDist = levenshtein(strippedUser, strippedAns);
@@ -278,7 +324,7 @@ function submitAnswer() {
 
   hasAnsweredCurrent = true;
   const q = quizQuestions[currentIndex];
-  const evalResult = validateAnswer(rawInput, q.answers);
+  const evalResult = validateAnswer(rawInput, q.answers, q.moduleId);
   const isCorrect = evalResult.isCorrect;
 
   userAnswers[currentIndex] = {
