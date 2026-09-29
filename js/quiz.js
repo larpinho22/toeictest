@@ -479,15 +479,27 @@ function goPrev() {
 function finishQuiz() {
   clearInterval(timerInterval);
   
-  // Fill unanswered questions with -1
-  items.forEach((item, i) => {
-    if (!userAnswers[i]) {
-      userAnswers[i] = { questionId: item.questionData.id, userAnswer: -1, correct: false, theme: item.questionData.theme, subtopic: item.questionData.subtopic, part: item.questionData.part };
-    }
+  const finalResults = items.map((item, i) => {
+    const q = item.questionData;
+    const ans = userAnswers[i];
+    const uIdx = (ans && ans.userAnswer !== undefined && ans.userAnswer !== null) ? ans.userAnswer : -1;
+    return {
+      questionId: q.id,
+      userAnswer: uIdx,
+      userAnswerText: uIdx >= 0 && q.options && q.options[uIdx] ? q.options[uIdx] : null,
+      correct: uIdx === q.answer,
+      correctAnswer: q.answer,
+      correctAnswerText: q.options ? q.options[q.answer] : '',
+      questionText: q.question,
+      options: q.options,
+      explanation: q.explanation,
+      theme: q.theme,
+      subtopic: q.subtopic,
+      part: q.part
+    };
   });
   
-  const answeredCount = userAnswers.filter(a => a.userAnswer !== -1).length;
-  const correctCount = userAnswers.filter(a => a.correct).length;
+  const correctCount = finalResults.filter(a => a.correct).length;
   const score = items.length > 0 ? Math.round((correctCount / items.length) * 100) : 0;
   
   const session = {
@@ -502,7 +514,7 @@ function finishQuiz() {
     parts: config.parts,
     themes: config.themes,
     subtopics: config.subtopics,
-    results: userAnswers
+    results: finalResults
   };
   
   saveSession(session);

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prépa Partiel Anglais | TOEIC Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .exam-hero {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(6, 182, 212, 0.12) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .exam-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .module-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+        .module-card:hover {
+            border-color: var(--accent-violet);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+        }
+        .module-card.mock-exam-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid var(--accent-violet);
+        }
+        .exam-input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: 1.1rem 1.25rem;
+            color: #f8fafc;
+            font-size: 1.15rem;
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+        }
+        .exam-input-field:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+        .exam-input-field:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .feedback-banner {
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-md);
+            margin-top: 1.5rem;
+            animation: slideUp 0.3s ease;
+        }
+        .feedback-banner.correct {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-left: 4px solid #10b981;
+        }
+        .feedback-banner.incorrect {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-left: 4px solid #ef4444;
+        }
+        .cheatsheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .cheatsheet-table th, .cheatsheet-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+            font-size: 0.925rem;
+        }
+        .cheatsheet-table th {
+            color: var(--accent-cyan-light);
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+        }
+    </style>
+</head>
+<body class="theme-dark">
+    <nav class="navbar flex-between">
+        <a href="index.html" class="nav-logo flex-center" style="text-decoration:none;">
+            <div class="nav-logo-icon">T</div>
+            <div style="font-weight:700; font-size:1.15rem; color:#f1f5f9; margin-left:0.5rem;">TOEIC<span class="text-gradient">Pro</span></div>
+        </a>
+        <div class="flex-center" style="gap: 1rem;">
+            <a href="index.html" class="nav-link">Accueil</a>
+            <a href="selection.html" class="nav-link">TOEIC</a>
+            <a href="exam.html" class="nav-link active" style="color:var(--accent-cyan); font-weight:700;">🎓 Partiel Anglais</a>
+            <a href="progress.html" class="nav-link">Stats</a>
+            <div class="user-chip flex-center">
+                <div class="user-avatar">?</div>
+                <span id="nav-username">User</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 100px; padding-bottom: 4rem;">
+        
+        <!-- ================================================================= -->
+        <!-- VIEW 1: MODULE SELECTOR -->
+        <!-- ================================================================= -->
+        <div id="view-selector">
+            <div class="exam-hero animate-slide-up">
+                <div class="flex-between" style="flex-wrap: wrap; gap: 1rem; align-items: flex-start;">
+                    <div style="max-width: 650px;">
+                        <span class="badge badge-cyan mb-2" style="font-weight:600;">Programme Officiel & Notes de Cours</span>
+                        <h1 class="text-gradient" style="font-size: 2.3rem; margin-bottom: 0.5rem;">Entraînement Partiel d'Anglais</h1>
+                        <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 0;">
+                            Prépare ton partiel avec saisie au clavier : vocabulaire de recrutement <em>"Liar Liar"</em>, diplômes & sections de CV, les 3 temps, voix passive et rédaction professionnelle.
+                        </p>
+                    </div>
+                    <button id="btn-open-cheatsheet-hero" class="btn btn-secondary" style="border-color: var(--accent-violet); white-space: nowrap;">
+                        📖 Fiche Mémo Récapitulative
+                    </button>
+                </div>
+            </div>
+
+            <!-- Simulation Grand Examen Blanc -->
+            <div class="module-card mock-exam-card mb-8 animate-slide-up" id="btn-start-mock-exam" style="padding: 2rem;">
+                <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+                            <span style="font-size:1.6rem;">🏆</span>
+                            <h2 style="margin: 0; font-size: 1.4rem; color: #f8fafc;">Simulation Complète : Grand Examen Blanc</h2>
+                            <span class="badge badge-violet">Note sur 20</span>
+                        </div>
+                        <p style="color: #cbd5e1; margin: 0; font-size: 0.95rem; max-width: 700px;">
+                            Un test intensif de 20 questions piochées au hasard parmi tous les modules pour simuler les conditions réelles de ton examen.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary btn-lg" style="box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);">
+                        Lancer l'Examen Blanc →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modules par thème -->
+            <h2 class="mb-4" style="font-size: 1.35rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>📚</span> <span>Modules d'Entraînement Ciblés</span>
+            </h2>
+            <div class="grid-3" id="modules-grid" style="gap: 1.25rem;">
+                <!-- Dynamically generated module cards -->
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 2: QUIZ / DRILL VIEW -->
+        <!-- ================================================================= -->
+        <div id="view-quiz" class="hidden">
+            <div class="flex-between mb-4 animate-slide-up" style="flex-wrap:wrap; gap:1rem;">
+                <button id="btn-quit-quiz" class="btn btn-ghost btn-sm" style="color:var(--text-secondary);">
+                    ← Retour aux modules
+                </button>
+                <div class="flex-center" style="gap: 0.75rem;">
+                    <span class="badge badge-violet" id="quiz-module-badge">Module</span>
+                    <button id="btn-open-cheatsheet-quiz" class="btn btn-ghost btn-sm" style="color:var(--accent-cyan-light); border:1px solid rgba(6,182,212,0.3); padding:0.3rem 0.75rem;">
+                        📖 Voir le cours
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="quiz-progress mb-6">
+                <div class="quiz-progress-bar" id="quiz-progress-bar"></div>
+            </div>
+
+            <div class="flex-between mb-2">
+                <span id="quiz-counter" style="font-weight:600; color:var(--text-secondary); font-size:0.9rem;">Question 1 / 10</span>
+                <span id="quiz-score-live" style="font-weight:600; color:var(--accent-cyan-light); font-size:0.9rem;">Score : 0 correct</span>
+            </div>
+
+            <!-- Quiz Card -->
+            <div class="card animate-slide-up" style="padding: 2.25rem 2rem; max-width: 850px; margin: 0 auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                <div style="font-size: 1.25rem; font-weight: 500; color: #f8fafc; line-height: 1.6; margin-bottom: 1.5rem;" id="quiz-prompt">
+                    Chargement de la question...
+                </div>
+
+                <div id="quiz-hint-box" class="hidden mb-4" style="padding:0.75rem 1rem; border-radius:8px; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.3); color:#f59e0b; font-size:0.9rem;">
+                    💡 Indice : <span id="quiz-hint-text"></span>
+                </div>
+
+                <form id="quiz-form" onsubmit="return false;" style="margin-bottom: 1.5rem;">
+                    <label for="quiz-input" style="display:block; font-size:0.875rem; color:var(--text-secondary); margin-bottom:0.5rem; font-weight:500;">
+                        Ta réponse en anglais (tape au clavier) :
+                    </label>
+                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                        <input type="text" id="quiz-input" class="exam-input-field" placeholder="Ex: claim, A-levels, is rising..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex:1; min-width:250px;">
+                        <button type="submit" id="btn-submit-answer" class="btn btn-primary btn-lg" style="min-width: 140px;">
+                            Valider ↵
+                        </button>
+                    </div>
+                </form>
+
+                <div class="flex-between">
+                    <button id="btn-show-hint" class="btn btn-ghost btn-sm" style="color:var(--text-muted); font-size:0.85rem;">
+                        💡 Afficher un indice
+                    </button>
+                    <button id="btn-skip-question" class="btn btn-ghost btn-sm" style="color:var(--text-muted); font-size:0.85rem;">
+                        Passer cette question →
+                    </button>
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="quiz-feedback" class="hidden">
+                    <div id="feedback-banner" class="feedback-banner">
+                        <div id="feedback-header" style="font-size:1.15rem; font-weight:700; margin-bottom:0.5rem;"></div>
+                        <div id="feedback-expected" style="font-size:1rem; margin-bottom:0.75rem;"></div>
+                        <div id="feedback-explanation" style="font-size:0.925rem; line-height:1.6; color:#e2e8f0; background:rgba(0,0,0,0.2); padding:0.85rem 1rem; border-radius:8px;"></div>
+                    </div>
+                    
+                    <div class="text-right mt-6">
+                        <button id="btn-next-question" class="btn btn-primary btn-lg">
+                            Question suivante →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 3: RESULTS SUMMARY -->
+        <!-- ================================================================= -->
+        <div id="view-results" class="hidden animate-slide-up" style="max-width: 850px; margin: 0 auto;">
+            <div class="card text-center mb-8" style="padding: 3rem 2rem;">
+                <div id="results-icon" style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎯</div>
+                <h1 id="results-title" class="text-gradient" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Entraînement Terminé !</h1>
+                <p id="results-subtitle" style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem;">Voici ton bilan détaillé pour cette session</p>
+                
+                <div style="display:inline-flex; align-items:center; justify-content:center; width:150px; height:150px; border-radius:50%; background:linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.15)); border:3px solid var(--accent-violet); margin:0 auto 1.5rem; flex-direction:column;">
+                    <div id="results-grade" style="font-size: 2.5rem; font-weight:800; color:#f8fafc; line-height:1;">18/20</div>
+                    <div id="results-pct" style="font-size: 0.9rem; color:var(--accent-cyan-light); font-weight:600; margin-top:0.25rem;">90%</div>
+                </div>
+                
+                <div id="results-badge" class="mb-6"></div>
+                
+                <div class="flex-center" style="gap: 1rem; flex-wrap: wrap;">
+                    <button id="btn-retry-module" class="btn btn-primary btn-lg">🔄 Recommencer ce module</button>
+                    <button id="btn-back-to-modules" class="btn btn-secondary btn-lg">📋 Choisir un autre thème</button>
+                </div>
+            </div>
+
+            <!-- Detailed Question Review -->
+            <div class="card mb-8">
+                <h3 class="mb-4" style="display:flex; align-items:center; gap:0.5rem;">
+                    <span>🔍</span> <span>Détail de toutes tes réponses</span>
+                </h3>
+                <div id="results-questions-list" style="display:flex; flex-direction:column; gap:1rem;">
+                    <!-- Question items injected here -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- CHEATSHEET MODAL / FICHE MÉMO DU COURS -->
+    <!-- ===================================================================== -->
+    <div id="cheatsheet-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 900px; width: 92%; max-height: 85vh; display: flex; flex-direction: column; padding: 2rem;">
+            <div class="flex-between mb-4" style="border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <span style="font-size: 1.5rem;">📖</span>
+                    <h2 style="margin: 0; font-size: 1.4rem; color: #f8fafc;">Fiche Mémo Complète du Partiel</h2>
+                </div>
+                <button id="btn-close-cheatsheet" class="btn btn-ghost btn-sm" style="font-size: 1.25rem; line-height: 1;">✕</button>
+            </div>
+
+            <div style="overflow-y: auto; padding-right: 0.5rem; flex: 1;">
+                <!-- Section 1: Liar Liar -->
+                <div class="mb-6">
+                    <h3 style="color:var(--accent-violet-light); font-size:1.15rem; margin-bottom:0.75rem;">
+                        1. Vocabulaire du Recrutement ("Liar Liar")
+                    </h3>
+                    <table class="cheatsheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Verbe</th>
+                                <th>Définition en anglais</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cheat-liar-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Section 2: Sections du CV & Diplômes -->
+                <div class="mb-6">
+                    <h3 style="color:var(--accent-cyan-light); font-size:1.15rem; margin-bottom:0.75rem;">
+                        2. Sections du CV & Équivalences des Diplômes (Sections 2-5)
+                    </h3>
+                    <table class="cheatsheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Français</th>
+                                <th>Anglais professionnel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cheat-trans-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Section 3: Loisirs & Soft Skills -->
+                <div class="mb-6">
+                    <h3 style="color:#f59e0b; font-size:1.15rem; margin-bottom:0.75rem;">
+                        3. Section 6 : Loisirs & Compétences Clés (Soft Skills)
+                    </h3>
+                    <table class="cheatsheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">Activité / Loisir</th>
+                                <th>Soft Skills démontrées</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cheat-skills-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Section 4: Les 3 Temps -->
+                <div class="mb-6">
+                    <h3 style="color:#10b981; font-size:1.15rem; margin-bottom:0.75rem;">
+                        4. Les 3 Temps (Présent, Passé & Perfect)
+                    </h3>
+                    <table class="cheatsheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Temps</th>
+                                <th style="width: 45%;">Règle & Emploi</th>
+                                <th>Marqueurs temporels</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cheat-tenses-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Section 5: Voix Passive -->
+                <div class="mb-4">
+                    <h3 style="color:#ec4899; font-size:1.15rem; margin-bottom:0.75rem;">
+                        5. Voix Active vs Voix Passive
+                    </h3>
+                    <table class="cheatsheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Temps / Règle</th>
+                                <th>Exemple transformation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cheat-passive-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="text-right mt-4" style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                <button id="btn-close-cheatsheet-bottom" class="btn btn-secondary">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/exam.js"></script>
+</body>
+</html>
