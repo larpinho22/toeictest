@@ -104,6 +104,158 @@ export const CHEATSHEET = {
       markers: 'already, yet, just, ever, never, since, for, so far, recently, lately'
     }
   ],
+  irregularVerbs: [
+  {
+    "inf": "to fall",
+    "past": "fell",
+    "pp": "fallen",
+    "fr": "tomber, chuter (température)"
+  },
+  {
+    "inf": "to rise",
+    "past": "rose",
+    "pp": "risen",
+    "fr": "augmenter, monter"
+  },
+  {
+    "inf": "to lead",
+    "past": "led",
+    "pp": "led",
+    "fr": "mener, diriger"
+  },
+  {
+    "inf": "to freeze",
+    "past": "froze",
+    "pp": "frozen",
+    "fr": "geler"
+  },
+  {
+    "inf": "to break",
+    "past": "broke",
+    "pp": "broken",
+    "fr": "casser, tomber en panne"
+  },
+  {
+    "inf": "to blow",
+    "past": "blew",
+    "pp": "blown",
+    "fr": "souffler (vent)"
+  },
+  {
+    "inf": "to grow",
+    "past": "grew",
+    "pp": "grown",
+    "fr": "croître, grandir"
+  },
+  {
+    "inf": "to spend",
+    "past": "spent",
+    "pp": "spent",
+    "fr": "dépenser, passer du temps"
+  },
+  {
+    "inf": "to build",
+    "past": "built",
+    "pp": "built",
+    "fr": "construire"
+  },
+  {
+    "inf": "to find",
+    "past": "found",
+    "pp": "found",
+    "fr": "trouver"
+  },
+  {
+    "inf": "to meet",
+    "past": "met",
+    "pp": "met",
+    "fr": "rencontrer, satisfaire (norme)"
+  },
+  {
+    "inf": "to understand",
+    "past": "understood",
+    "pp": "understood",
+    "fr": "comprendre"
+  },
+  {
+    "inf": "to buy",
+    "past": "bought",
+    "pp": "bought",
+    "fr": "acheter"
+  },
+  {
+    "inf": "to run",
+    "past": "ran",
+    "pp": "run",
+    "fr": "fonctionner, tourner (moteur)"
+  },
+  {
+    "inf": "to shut",
+    "past": "shut",
+    "pp": "shut",
+    "fr": "fermer, arrêter (centrale)"
+  },
+  {
+    "inf": "to lose",
+    "past": "lost",
+    "pp": "lost",
+    "fr": "perdre (chaleur)"
+  },
+  {
+    "inf": "to choose",
+    "past": "chose",
+    "pp": "chosen",
+    "fr": "choisir"
+  },
+  {
+    "inf": "to pay",
+    "past": "paid",
+    "pp": "paid",
+    "fr": "payer"
+  },
+  {
+    "inf": "to cut",
+    "past": "cut",
+    "pp": "cut",
+    "fr": "couper, réduire"
+  },
+  {
+    "inf": "to hear",
+    "past": "heard",
+    "pp": "heard",
+    "fr": "entendre"
+  },
+  {
+    "inf": "to sell",
+    "past": "sold",
+    "pp": "sold",
+    "fr": "vendre"
+  },
+  {
+    "inf": "to take",
+    "past": "took",
+    "pp": "taken",
+    "fr": "prendre, nécessiter"
+  },
+  {
+    "inf": "to write",
+    "past": "wrote",
+    "pp": "written",
+    "fr": "écrire"
+  },
+  {
+    "inf": "to send",
+    "past": "sent",
+    "pp": "sent",
+    "fr": "envoyer"
+  },
+  {
+    "inf": "to see",
+    "past": "saw",
+    "pp": "seen",
+    "fr": "voir"
+  }
+],
   passiveVoice: [
     { rule: 'Formation', explanation: 'Subject + BE (conjugé au bon temps) + Past Participle (+ by agent)' },
     { rule: 'Present Simple', explanation: 'Active: "They produce energy" → Passive: "Energy is produced"' },
@@ -969,6 +1121,286 @@ export const EXAM_QUESTIONS = [
     explanation: "'This month' is an unfinished period: use <strong>Present Perfect</strong> (have saved).",
     hint: "have + saved"
   },
+  {
+    id: 'ts_036',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"During the cold snap last December, the outside temperature ________ (fall) to minus ten degrees Celsius.\"",
+    answers: ["fell"],
+    explanation: "The irregular past simple of fall is <strong>fell</strong> (fall-fell-fallen). 'Last December' marks a finished past action.",
+    hint: "Past simple of fall (4 letters)"
+  },
+  {
+    id: 'ts_037',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Look at the barometer! Atmospheric pressure ________ (drop) very quickly.\"",
+    answers: ["is dropping"],
+    explanation: "'Look!' indicates an action in progress right now: use <strong>Present Continuous</strong> (is dropping). Note the double 'p' (consonant-vowel-consonant rule).",
+    hint: "be + drop (double p) + ing"
+  },
+  {
+    id: 'ts_038',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The share of wind and solar energy in France ________ (grow) significantly over the last five years.\"",
+    answers: ["has grown"],
+    explanation: "The irregular past participle of grow is <strong>grown</strong> (grow-grew-grown). With 'over the last five years' (unfinished period connected to present), use <strong>Present Perfect</strong> (has grown).",
+    hint: "has + irregular past participle of grow"
+  },
+  {
+    id: 'ts_039',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Last year, the chief technician ________ (lead) the project to replace the campus gas boilers.\"",
+    answers: ["led"],
+    explanation: "The past simple of lead is <strong>led</strong> (single 'e', not 'leaded').",
+    hint: "3 letters (starts with L)"
+  },
+  {
+    id: 'ts_040',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Careful! Steam ________ (leak) from the main valve right now.\"",
+    answers: ["is leaking"],
+    explanation: "'Right now' indicates an action occurring this instant: use <strong>Present Continuous</strong> (is leaking).",
+    hint: "is + leak + ing"
+  },
+  {
+    id: 'ts_041',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Since installing the heat recovery unit, our factory ________ (cut) its natural gas consumption by 30%.\"",
+    answers: ["has cut"],
+    explanation: "'Cut' is an invariable irregular verb (cut-cut-cut). 'Since' demands the <strong>Present Perfect</strong> (has cut).",
+    hint: "has + cut"
+  },
+  {
+    id: 'ts_042',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Two winters ago, the external drainage pipe ________ (freeze) during the polar vortex.\"",
+    answers: ["froze"],
+    explanation: "The irregular past simple of freeze is <strong>froze</strong> (freeze-froze-frozen).",
+    hint: "5 letters (starts with F)"
+  },
+  {
+    id: 'ts_043',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The geothermal fluid ________ (already / freeze) inside the heat exchanger, so we must stop the pump immediately.\"",
+    answers: ["has already frozen","has frozen"],
+    explanation: "Present perfect with already: <strong>has already frozen</strong> (past participle of freeze is frozen).",
+    hint: "has + already + frozen"
+  },
+  {
+    id: 'ts_044',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"In 2023, the municipality ________ (spend) 150,000 euros on double-glazed window retrofits.\"",
+    answers: ["spent"],
+    explanation: "The irregular past simple of spend is <strong>spent</strong> (ends with 't').",
+    hint: "5 letters (ends with -t)"
+  },
+  {
+    id: 'ts_045',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"According to recent sensor data, thermal losses ________ (decrease) steadily this month.\"",
+    answers: ["are decreasing"],
+    explanation: "An ongoing trend in an active period takes the <strong>Present Continuous</strong> (are decreasing). Drop the 'e' before adding -ing.",
+    hint: "are + decrease (drop e) + ing"
+  },
+  {
+    id: 'ts_046',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"During yesterday's building inspection, the thermal auditors ________ (find) three major cold air leaks in the roof.\"",
+    answers: ["found"],
+    explanation: "The past simple of find is <strong>found</strong>.",
+    hint: "5 letters (starts with F)"
+  },
+  {
+    id: 'ts_047',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Our HVAC installation ________ (already / meet) all European energy performance standards.\"",
+    answers: ["has already met","has met"],
+    explanation: "The irregular past participle of meet is <strong>met</strong>. With 'already', use <strong>Present Perfect</strong> (has already met).",
+    hint: "has already + met (single e)"
+  },
+  {
+    id: 'ts_048',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"A pressure surge ________ (break) the mechanical seal of the pump three days ago.\"",
+    answers: ["broke"],
+    explanation: "Past simple of break is <strong>broke</strong>. 'Ago' requires the Past Simple.",
+    hint: "5 letters (starts with B)"
+  },
+  {
+    id: 'ts_049',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The primary circulation fan ________ (just / break) down, so the building is getting cold.\"",
+    answers: ["has just broken","has broken"],
+    explanation: "'Just' indicates a recent action with a direct impact on the present: use <strong>Present Perfect</strong> (has just broken).",
+    hint: "has just + broken"
+  },
+  {
+    id: 'ts_050',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Last term, our IUT department ________ (buy) a new FLIR thermal imaging camera.\"",
+    answers: ["bought"],
+    explanation: "The irregular past simple of buy is <strong>bought</strong>.",
+    hint: "b-o-u-g-h-t"
+  },
+  {
+    id: 'ts_051',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Listen! The emergency backup generator ________ (run) right now.\"",
+    answers: ["is running"],
+    explanation: "'Listen!' and 'right now' require the <strong>Present Continuous</strong> (is running). Note the double 'n'.",
+    hint: "is + run (double n) + ing"
+  },
+  {
+    id: 'ts_052',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Yesterday, the diesel generator ________ (run) continuously for six hours during the blackout.\"",
+    answers: ["ran"],
+    explanation: "The past simple of run is <strong>ran</strong>.",
+    hint: "3 letters: r-a-n"
+  },
+  {
+    id: 'ts_053',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The strong gale force wind ________ (blow) at 90 km/h yesterday, generating record electrical power.\"",
+    answers: ["blew"],
+    explanation: "The irregular past simple of blow is <strong>blew</strong> (blow-blew-blown).",
+    hint: "4 letters: b-l-e-w"
+  },
+  {
+    id: 'ts_054',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The wind ________ (blow) steadily since this morning, keeping the turbines spinning at top speed.\"",
+    answers: ["has blown","has been blowing"],
+    explanation: "'Since this morning' indicates continuity up to the present: use <strong>Present Perfect</strong> (has blown).",
+    hint: "has + blown"
+  },
+  {
+    id: 'ts_055',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Before retrofitting the insulation, the uninsulated house ________ (lose) over 35% of its heat through the roof.\"",
+    answers: ["lost"],
+    explanation: "The past simple of lose is <strong>lost</strong> (single 'o').",
+    hint: "4 letters (l-o-s-t)"
+  },
+  {
+    id: 'ts_056',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The district heating network ________ (never / lose) so much thermal energy in a single week.\"",
+    answers: ["has never lost"],
+    explanation: "'Never' with experience up to now demands <strong>Present Perfect</strong> (has never lost).",
+    hint: "has never + lost"
+  },
+  {
+    id: 'ts_057',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The client ________ (pay) the invoice for the heating maintenance yesterday.\"",
+    answers: ["paid"],
+    explanation: "The irregular past simple of pay is <strong>paid</strong> (not 'payed').",
+    hint: "4 letters (p-a-i-d)"
+  },
+  {
+    id: 'ts_058',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"At present, the solar plant ________ (operate) at 95% of its peak capacity.\"",
+    answers: ["is operating"],
+    explanation: "'At present' indicates current operation: use <strong>Present Continuous</strong> (is operating).",
+    hint: "is + operate (drop e) + ing"
+  },
+  {
+    id: 'ts_059',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"It ________ (take) the technicians three hours to balance the hydraulic circuit yesterday.\"",
+    answers: ["took"],
+    explanation: "The past simple of take is <strong>took</strong>.",
+    hint: "4 letters (t-o-o-k)"
+  },
+  {
+    id: 'ts_060',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Eliot and his team ________ (maintain) this biomass heating facility for five years now.\"",
+    answers: ["have maintained","have been maintaining"],
+    explanation: "'For five years now' indicates an ongoing duration up to the present: use <strong>Present Perfect</strong> (have maintained).",
+    hint: "have + maintained"
+  },
+  {
+    id: 'ts_061',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"After the practical lab session, the students finally ________ (understand) the Carnot thermodynamic efficiency cycle.\"",
+    answers: ["understood"],
+    explanation: "The past simple of understand is <strong>understood</strong>.",
+    hint: "ends with -stood"
+  },
+  {
+    id: 'ts_062',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Look at the water tank gauge! The water level ________ (rise) rapidly.\"",
+    answers: ["is rising"],
+    explanation: "'Look!' + action in real time = <strong>Present Continuous</strong> (is rising). Drop the final 'e' before -ing.",
+    hint: "is + rise (drop e) + ing"
+  },
+  {
+    id: 'ts_063',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Between 2021 and 2023, electricity rates ________ (rise) by 28% in our region.\"",
+    answers: ["rose"],
+    explanation: "The irregular past simple of rise is <strong>rose</strong>.",
+    hint: "4 letters (r-o-s-e)"
+  },
+  {
+    id: 'ts_064',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Global energy demand ________ (rise) to historic levels this year.\"",
+    answers: ["has risen"],
+    explanation: "Unfinished period (this year): use <strong>Present Perfect</strong> (has risen). Past participle of rise is risen.",
+    hint: "has + risen"
+  },
+  {
+    id: 'ts_065',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"In 2020, the factory ________ (sell) its old fuel-oil generators to transition to green electricity.\"",
+    answers: ["sold"],
+    explanation: "The irregular past simple of sell is <strong>sold</strong>.",
+    hint: "4 letters (s-o-l-d)"
+  },
+  {
+    id: 'ts_066',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"The safety board ________ (not / publish) the official report on the turbine fire yet.\"",
+    answers: ["has not published","hasn't published"],
+    explanation: "'Yet' in a negative sentence demands the <strong>Present Perfect</strong>: has not published.",
+    hint: "has not + published"
+  },
+  {
+    id: 'ts_067',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"While checking the boiler room, the night guard ________ (hear) an alarm beeping.\"",
+    answers: ["heard"],
+    explanation: "The past simple of hear is <strong>heard</strong> (add 'd', pronounced /hɜːd/).",
+    hint: "5 letters (h-e-a-r-d)"
+  },
+  {
+    id: 'ts_068',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"Currently, our engineering firm ________ (plan) the construction of a district heating network.\"",
+    answers: ["is planning"],
+    explanation: "'Currently' takes the <strong>Present Continuous</strong> (is planning). Note the double 'n'.",
+    hint: "is + plan (double n) + ing"
+  },
+  {
+    id: 'ts_069',
+    moduleId: 'tenses',
+    prompt: "Type the negative past simple form: \"The building ________ (not / consume) any gas last month because the solar panels were sufficient.\"",
+    answers: ["did not consume","didn't consume"],
+    explanation: "Negative past simple: <strong>did not consume</strong> (did not + base verb).",
+    hint: "did not + consume"
+  },
+  {
+    id: 'ts_070',
+    moduleId: 'tenses',
+    prompt: "Type the verb in the correct tense: \"We ________ (already / inspect) fifty thermal substations this quarter.\"",
+    answers: ["have already inspected","have inspected"],
+    explanation: "'Already' with current quarterly progress: use <strong>Present Perfect</strong> (have already inspected).",
+    hint: "have already + inspected"
+  },
   // --------------------------------------------------------------------------
   // MODULE 4: ACTIVE VS PASSIVE VOICE
   // --------------------------------------------------------------------------
@@ -1155,6 +1587,182 @@ export const EXAM_QUESTIONS = [
     answers: ["old halogen light bulbs should be replaced with leds","old halogen light bulbs should be replaced by leds"],
     explanation: "Modal passive: should + be + replaced. <strong>\"Old halogen light bulbs should be replaced with LEDs.\"</strong>",
     hint: "Start with \"Old halogen light bulbs should be replaced...\""
+  },
+  {
+    id: 'pv_024',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The heat pump produces hot water efficiently.\"",
+    answers: ["hot water is produced efficiently by the heat pump","hot water is produced by the heat pump efficiently","hot water is produced efficiently"],
+    explanation: "Present simple passive: is + produced. <strong>\"Hot water is produced efficiently by the heat pump.\"</strong>",
+    hint: "Start with \"Hot water is produced...\""
+  },
+  {
+    id: 'pv_025',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"Engineers will overhaul the ventilation network next summer.\"",
+    answers: ["the ventilation network will be overhauled next summer by engineers","the ventilation network will be overhauled by engineers next summer","the ventilation network will be overhauled next summer","next summer the ventilation network will be overhauled by engineers"],
+    explanation: "Future passive: will + be + overhauled. <strong>\"The ventilation network will be overhauled next summer (by engineers).\"</strong>",
+    hint: "Start with \"The ventilation network will be overhauled...\""
+  },
+  {
+    id: 'pv_026',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The laboratory has calibrated all digital thermometers.\"",
+    answers: ["all digital thermometers have been calibrated by the laboratory","all digital thermometers have been calibrated"],
+    explanation: "Present perfect passive: have + been + calibrated. <strong>\"All digital thermometers have been calibrated by the laboratory.\"</strong>",
+    hint: "Start with \"All digital thermometers have been calibrated...\""
+  },
+  {
+    id: 'pv_027',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"They are testing the new biomass generator today.\"",
+    answers: ["the new biomass generator is being tested today","the new biomass generator is being tested today by them","today the new biomass generator is being tested"],
+    explanation: "Present continuous passive: is + being + tested. <strong>\"The new biomass generator is being tested today.\"</strong>",
+    hint: "Start with \"The new biomass generator is being tested...\""
+  },
+  {
+    id: 'pv_028',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The city built a modern geothermal plant in 2019.\"",
+    answers: ["a modern geothermal plant was built in 2019 by the city","a modern geothermal plant was built by the city in 2019","in 2019 a modern geothermal plant was built by the city"],
+    explanation: "Past simple passive: was + built (irregular past participle of build). <strong>\"A modern geothermal plant was built in 2019 by the city.\"</strong>",
+    hint: "Start with \"A modern geothermal plant was built...\""
+  },
+  {
+    id: 'pv_029',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"We must reduce industrial energy consumption immediately.\"",
+    answers: ["industrial energy consumption must be reduced immediately","industrial energy consumption must be reduced immediately by us"],
+    explanation: "Modal passive: must + be + reduced. <strong>\"Industrial energy consumption must be reduced immediately.\"</strong>",
+    hint: "Start with \"Industrial energy consumption must be reduced...\""
+  },
+  {
+    id: 'pv_030',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"Technicians were repairing the solar array when the thunderstorm began.\"",
+    answers: ["the solar array was being repaired by technicians when the thunderstorm began","the solar array was being repaired when the thunderstorm began"],
+    explanation: "Past continuous passive: was + being + repaired. <strong>\"The solar array was being repaired (by technicians) when the thunderstorm began.\"</strong>",
+    hint: "Start with \"The solar array was being repaired...\""
+  },
+  {
+    id: 'pv_031',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The technician replaced the blown fuse yesterday.\"",
+    answers: ["the blown fuse was replaced yesterday by the technician","the blown fuse was replaced by the technician yesterday","the blown fuse was replaced yesterday","yesterday the blown fuse was replaced by the technician"],
+    explanation: "Past simple passive: was + replaced. <strong>\"The blown fuse was replaced yesterday by the technician.\"</strong>",
+    hint: "Start with \"The blown fuse was replaced...\""
+  },
+  {
+    id: 'pv_032',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"They have cut heating costs by 30%.\"",
+    answers: ["heating costs have been cut by 30%","heating costs have been cut by 30% by them"],
+    explanation: "Present perfect passive: have + been + cut. <strong>\"Heating costs have been cut by 30%.\"</strong>",
+    hint: "Start with \"Heating costs have been cut...\""
+  },
+  {
+    id: 'pv_033',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"French regulations prohibit single-glazed windows in new buildings.\"",
+    answers: ["single-glazed windows are prohibited in new buildings by french regulations","single-glazed windows are prohibited in new buildings","single glazed windows are prohibited in new buildings"],
+    explanation: "Present simple passive: are + prohibited. <strong>\"Single-glazed windows are prohibited in new buildings (by French regulations).\"</strong>",
+    hint: "Start with \"Single-glazed windows are prohibited...\""
+  },
+  {
+    id: 'pv_034',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The audit team found several thermal bridges in the ceiling.\"",
+    answers: ["several thermal bridges were found in the ceiling by the audit team","several thermal bridges were found in the ceiling"],
+    explanation: "Past simple passive: were (plural) + found. <strong>\"Several thermal bridges were found in the ceiling by the audit team.\"</strong>",
+    hint: "Start with \"Several thermal bridges were found...\""
+  },
+  {
+    id: 'pv_035',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"A qualified technician should service the air conditioner annually.\"",
+    answers: ["the air conditioner should be serviced annually by a qualified technician","the air conditioner should be serviced annually","the air conditioner should be serviced by a qualified technician annually"],
+    explanation: "Modal passive: should + be + serviced. <strong>\"The air conditioner should be serviced annually by a qualified technician.\"</strong>",
+    hint: "Start with \"The air conditioner should be serviced...\""
+  },
+  {
+    id: 'pv_036',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The firm operates five major wind farms across northern France.\"",
+    answers: ["five major wind farms are operated across northern france by the firm","five major wind farms are operated by the firm across northern france","five major wind farms are operated across northern france"],
+    explanation: "Present simple passive: are + operated. <strong>\"Five major wind farms are operated across northern France by the firm.\"</strong>",
+    hint: "Start with \"Five major wind farms are operated...\""
+  },
+  {
+    id: 'pv_037',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The supplier will deliver the photovoltaic inverters next Tuesday.\"",
+    answers: ["the photovoltaic inverters will be delivered next tuesday by the supplier","the photovoltaic inverters will be delivered next tuesday","next tuesday the photovoltaic inverters will be delivered"],
+    explanation: "Future passive: will + be + delivered. <strong>\"The photovoltaic inverters will be delivered next Tuesday (by the supplier).\"</strong>",
+    hint: "Start with \"The photovoltaic inverters will be delivered...\""
+  },
+  {
+    id: 'pv_038',
+    moduleId: 'passive',
+    prompt: "Rewrite in the passive voice: \"The site manager has approved the new safety procedures.\"",
+    answers: ["the new safety procedures have been approved by the site manager","the new safety procedures have been approved"],
+    explanation: "Present perfect passive: have + been + approved. <strong>\"The new safety procedures have been approved by the site manager.\"</strong>",
+    hint: "Start with \"The new safety procedures have been approved...\""
+  },
+  {
+    id: 'pv_039',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence with the verb in brackets: \"Look out! The hot water pipe ________ (weld) by the technician right now.\"",
+    answers: ["is being welded"],
+    explanation: "'Right now' + singular passive: <strong>is being welded</strong> (Present Continuous Passive).",
+    hint: "is being + welded"
+  },
+  {
+    id: 'pv_040',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence with the verb in brackets: \"Since 2020, over three million euros ________ (invest) in renewable energies by the region.\"",
+    answers: ["have been invested","has been invested"],
+    explanation: "'Since 2020' + passive: <strong>have been invested</strong> (Present Perfect Passive).",
+    hint: "have been + invested"
+  },
+  {
+    id: 'pv_041',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence with the past simple passive: \"The old coal power plant ________ (shut) down permanently three years ago.\"",
+    answers: ["was shut"],
+    explanation: "'Three years ago' + passive of shut: <strong>was shut</strong> (shut is invariable: shut-shut-shut).",
+    hint: "was + shut"
+  },
+  {
+    id: 'pv_042',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence with the present simple passive: \"Electricity consumption data ________ (send) directly to the central server every minute.\"",
+    answers: ["is sent","are sent"],
+    explanation: "Present simple passive of send: <strong>is sent</strong> (data can be singular/uncountable in English).",
+    hint: "is + irregular past participle of send (ends in -t)"
+  },
+  {
+    id: 'pv_043',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence with the modal passive: \"Excess solar power ________ (can / store) in lithium-ion battery packs.\"",
+    answers: ["can be stored"],
+    explanation: "Modal passive: <strong>can be stored</strong> (can + be + past participle).",
+    hint: "can be + stored"
+  },
+  {
+    id: 'pv_044',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence with the past simple passive: \"The pressure regulator ________ (break) during yesterday's stress test.\"",
+    answers: ["was broken"],
+    explanation: "Past simple passive of break: <strong>was broken</strong> (was + past participle broken).",
+    hint: "was + broken"
+  },
+  {
+    id: 'pv_045',
+    moduleId: 'passive',
+    prompt: "Complete the passive sentence: \"Such extreme thermal efficiency ________ (never / see) in this building before.\"",
+    answers: ["has never been seen","was never seen"],
+    explanation: "Present perfect passive with never: <strong>has never been seen</strong> (has been + past participle seen).",
+    hint: "has never been + seen"
   },
   // --------------------------------------------------------------------------
   // MODULE 5: CV DOCTOR & COVER LETTER

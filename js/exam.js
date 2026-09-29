@@ -773,6 +773,19 @@ function populateCheatsheet() {
       </tr>
     `).join('');
   }
+
+  // Irregular Verbs
+  const verbsTbody = document.getElementById('cheat-verbs-tbody');
+  if (verbsTbody && CHEATSHEET.irregularVerbs) {
+    verbsTbody.innerHTML = CHEATSHEET.irregularVerbs.map(item => `
+      <tr>
+        <td style="color:#38bdf8; font-weight:700;">${item.inf}</td>
+        <td style="color:#10b981; font-weight:600;">${item.past}</td>
+        <td style="color:#a78bfa; font-weight:600;">${item.pp}</td>
+        <td style="color:#cbd5e1; font-size:0.875rem;">${item.fr}</td>
+      </tr>
+    `).join('');
+  }
 }
 
 function openCheatsheet() {
