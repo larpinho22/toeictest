@@ -405,12 +405,16 @@ function diagnoseError(userInput, q) {
     return `Attention : <em>"working knowledge"</em> signifie seulement <strong>avoir les bases</strong>. Pour exprimer le fait de <strong>très bien maîtriser</strong> un logiciel, on emploie <strong>"proficient with"</strong>.`;
   }
 
-  if (qId === 'wr_003' && userLower.includes('faithfully')) {
-    return `Tu as confondu les formules de politesse : comme la lettre s'adresse à une personne nommée (<em>"Dear Mr. Smith"</em>), il faut obligatoirement conclure par <strong>"Yours sincerely"</strong>. <em>"Yours faithfully"</em> n'est utilisé que lorsque tu ne connais pas le nom (<em>"Dear Sir or Madam"</em>).`;
+  if ((qId === 'wr_003' || qId === 'wr_007') && userLower.includes('faithfully')) {
+    return `Tu as confondu les formules de politesse : comme la lettre s'adresse à une personne nommée (<em>"Dear Mr./Ms..."</em>), il faut obligatoirement conclure par <strong>"Yours sincerely"</strong>. <em>"Yours faithfully"</em> n'est utilisé que lorsque tu ne connais pas le nom (<em>"Dear Sir or Madam"</em>).`;
   }
 
-  if (qId === 'wr_004' && userLower.includes('sincerely')) {
+  if ((qId === 'wr_004' || qId === 'wr_008') && userLower.includes('sincerely')) {
     return `Tu as confondu les formules de politesse : lorsque la lettre commence par <em>"Dear Sir or Madam"</em> (destinataire inconnu), la formule officielle britannique est <strong>"Yours faithfully"</strong>. <em>"Yours sincerely"</em> est réservé aux destinataires nommés.`;
+  }
+
+  if (qId === 'wr_010' && userLower.includes('hear') && !userLower.includes('hearing')) {
+    return `Attention au piège classique du partiel : après l'expression <em>"look forward to"</em>, 'to' est une préposition ! Le verbe qui suit se met donc obligatoirement au gérondif en <strong>-ING</strong> : <em>"I look forward to <strong>hearing</strong> from you."</em>`;
   }
 
   if (mod === 'passive') {
