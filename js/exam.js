@@ -141,6 +141,20 @@ function renderQuestion(index) {
   document.getElementById('btn-skip-question').disabled = false;
 }
 
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
+      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
 function normalize(str) {
   if (!str) return '';
   return str
@@ -151,24 +165,102 @@ function normalize(str) {
     .trim();
 }
 
+function cleanParticles(str) {
+  return str
+    .replace(/^(to|the|a|an)\s+/i, '')
+    .replace(/\s+(for|of|with|in|at|on|by|to|job|work|skills)$/i, '')
+    .replace(/s$/i, '')
+    .trim();
+}
+
 function validateAnswer(userInput, validAnswers) {
   const normUser = normalize(userInput);
-  if (!normUser) return false;
+  if (!normUser) return { isCorrect: false };
 
-  return validAnswers.some(ans => {
+  // 1. Direct or normalized match
+  for (const ans of validAnswers) {
     const normAns = normalize(ans);
-    if (normUser === normAns) return true;
-    
-    // Check if user omitted "to " for verbs (e.g., "claim" instead of "to claim")
-    if (normAns.startsWith('to ') && normUser === normAns.substring(3)) return true;
-    if (normUser.startsWith('to ') && normUser.substring(3) === normAns) return true;
-    
-    // Check with/without "by [agent]" if sentence contains "by"
-    const ansWithoutBy = normAns.replace(/\s+by\s+[a-z\s]+$/i, '').trim();
-    if (normUser === ansWithoutBy) return true;
+    if (normUser === normAns) {
+      return { isCorrect: true, matchedAnswer: ans, type: 'exact' };
+    }
+  }
 
-    return false;
-  });
+  // 2. Preposition / particle stripped match (e.g. "apply for" vs "apply", "a-levels" vs "a-level")
+  const strippedUser = cleanParticles(normUser);
+  for (const ans of validAnswers) {
+    const normAns = normalize(ans);
+    const strippedAns = cleanParticles(normAns);
+    if (strippedUser && strippedAns && strippedUser === strippedAns) {
+      return { isCorrect: true, matchedAnswer: ans, type: 'particle' };
+    }
+  }
+
+  // 3. Subphrase & containment matching (e.g. user typed "apply for" and target is "apply", or user typed "honours" and target is "with honours")
+  for (const ans of validAnswers) {
+    const normAns = normalize(ans);
+    const ansWords = normAns.split(' ');
+    const userWords = normUser.split(' ');
+    
+    // User input contains target keyword (e.g. user: "apply for", target: "apply")
+    if (ansWords.length <= 2 && userWords.length <= 4) {
+      if (userWords.includes(normAns) || normUser.startsWith(normAns + ' ') || normUser.endsWith(' ' + normAns)) {
+        return { isCorrect: true, matchedAnswer: ans, type: 'subphrase' };
+      }
+    }
+
+    // Target contains user input (e.g. user: "honours", target: "with honours")
+    if (userWords.length >= 1 && ansWords.length <= 4) {
+      if (ansWords.includes(normUser) || normAns.includes(normUser)) {
+        return { isCorrect: true, matchedAnswer: ans, type: 'subphrase' };
+      }
+    }
+  }
+
+  // 4. Fuzzy Levenshtein match (typo tolerance)
+  for (const ans of validAnswers) {
+    const normAns = normalize(ans);
+    const dist = levenshtein(normUser, normAns);
+    const maxLen = Math.max(normUser.length, normAns.length);
+    
+    let allowedDist = 0;
+    if (maxLen >= 14) allowedDist = 3;
+    else if (maxLen >= 7) allowedDist = 2;
+    else if (maxLen >= 4) allowedDist = 1;
+
+    if (dist <= allowedDist) {
+      return { isCorrect: true, matchedAnswer: ans, type: 'typo', dist };
+    }
+
+    // Also try fuzzy match on stripped versions
+    const strippedAns = cleanParticles(normAns);
+    if (strippedUser && strippedAns) {
+      const strippedDist = levenshtein(strippedUser, strippedAns);
+      const sMaxLen = Math.max(strippedUser.length, strippedAns.length);
+      let sAllowed = sMaxLen >= 12 ? 3 : sMaxLen >= 7 ? 2 : sMaxLen >= 4 ? 1 : 0;
+      if (strippedDist <= sAllowed) {
+        return { isCorrect: true, matchedAnswer: ans, type: 'typo', dist: strippedDist };
+      }
+    }
+  }
+
+  // 5. Sentence similarity (for passive voice rewrites)
+  for (const ans of validAnswers) {
+    const normAns = normalize(ans);
+    if (normAns.split(' ').length >= 5) {
+      const uWords = normUser.split(' ');
+      const aWords = normAns.split(' ');
+      const matchWords = uWords.filter(w => aWords.includes(w));
+      const overlapRatio = (matchWords.length * 2) / (uWords.length + aWords.length);
+      const dist = levenshtein(normUser, normAns);
+      const charSimilarity = 1 - (dist / Math.max(normUser.length, normAns.length));
+      
+      if (overlapRatio >= 0.78 || charSimilarity >= 0.83) {
+        return { isCorrect: true, matchedAnswer: ans, type: 'near-sentence' };
+      }
+    }
+  }
+
+  return { isCorrect: false };
 }
 
 function submitAnswer() {
@@ -186,12 +278,14 @@ function submitAnswer() {
 
   hasAnsweredCurrent = true;
   const q = quizQuestions[currentIndex];
-  const isCorrect = validateAnswer(rawInput, q.answers);
+  const evalResult = validateAnswer(rawInput, q.answers);
+  const isCorrect = evalResult.isCorrect;
 
   userAnswers[currentIndex] = {
     question: q,
     userInput: rawInput,
-    isCorrect
+    isCorrect,
+    evalResult
   };
 
   input.disabled = true;
@@ -209,9 +303,23 @@ function submitAnswer() {
   banner.className = `feedback-banner ${isCorrect ? 'correct' : 'incorrect'}`;
 
   if (isCorrect) {
-    header.innerHTML = '🎉 Exactement ! Excellente réponse.';
-    header.style.color = '#10b981';
-    expected.innerHTML = '';
+    if (evalResult.type === 'exact') {
+      header.innerHTML = '🎉 Exactement ! Excellente réponse.';
+      header.style.color = '#10b981';
+      expected.innerHTML = '';
+    } else if (evalResult.type === 'typo') {
+      header.innerHTML = '✅ Accepté ! (Presque parfait)';
+      header.style.color = '#10b981';
+      expected.innerHTML = `<span style="color:#f59e0b; font-size:0.95rem;">⚠️ Attention à la petite faute d'orthographe : <strong>${evalResult.matchedAnswer}</strong></span>`;
+    } else if (evalResult.type === 'particle' || evalResult.type === 'subphrase') {
+      header.innerHTML = '✅ Accepté ! C\'est la bonne réponse.';
+      header.style.color = '#10b981';
+      expected.innerHTML = `<span style="color:#22d3ee; font-size:0.95rem;">💡 Bien vu ! (Formulation attendue : <strong>${evalResult.matchedAnswer}</strong>)</span>`;
+    } else if (evalResult.type === 'near-sentence') {
+      header.innerHTML = '✅ Accepté ! Bonne structure passive.';
+      header.style.color = '#10b981';
+      expected.innerHTML = `<span style="color:#22d3ee; font-size:0.95rem;">💡 Phrase type : <strong>${evalResult.matchedAnswer}</strong></span>`;
+    }
   } else {
     header.innerHTML = '❌ Pas tout à fait.';
     header.style.color = '#ef4444';
@@ -321,7 +429,7 @@ function finishExam() {
       <div class="flex-between mb-2" style="flex-wrap:wrap; gap:0.5rem;">
         <span style="font-weight:700; color:#cbd5e1; font-size:0.85rem;">Question ${idx + 1}</span>
         <span class="badge" style="font-size:0.8rem; background:${ans.isCorrect ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; color:${ans.isCorrect ? '#10b981' : '#ef4444'};">
-          ${ans.isCorrect ? '✅ Correct' : '❌ Erreur'}
+          ${ans.isCorrect ? (ans.evalResult?.type === 'exact' ? '✅ Correct' : '✅ Correct (Accepté)') : '❌ Erreur'}
         </span>
       </div>
       <div style="font-size:1.05rem; font-weight:500; color:#f8fafc; line-height:1.5; margin-bottom:1rem;">

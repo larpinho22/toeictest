@@ -211,7 +211,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_001',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Baccalauréat"',
-    answers: ['a-levels', 'a levels', 'high school diploma'],
+    answers: ['a-levels', 'a levels', 'a-level', 'a level', 'alevels', 'high school diploma'],
     explanation: 'In the UK, the equivalent of the French Baccalauréat is <strong>A-levels</strong> (or High school diploma in the US).',
     hint: 'Hyphenated letter + plural word'
   },
@@ -219,7 +219,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_002',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Avec mention" (e.g., Baccalauréat avec mention)',
-    answers: ['with honours', 'with distinction', 'with honors'],
+    answers: ['with honours', 'with distinction', 'with honors', 'honours', 'honors', 'distinction'],
     explanation: '<strong>With honours</strong> (UK) or <strong>with distinction</strong> is the standard academic translation.',
     hint: 'with h...'
   },
@@ -227,7 +227,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_003',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "BUT (Bachelor Universitaire de Technologie)"',
-    answers: ['bachelor of technology', 'bachelor in technology', 'vocational bachelor'],
+    answers: ['bachelor of technology', 'bachelor in technology', 'vocational bachelor', 'bachelor of technology in energy transition and efficiency'],
     explanation: 'The official academic translation for a BUT is <strong>Bachelor of Technology</strong>.',
     hint: 'Bachelor of T...'
   },
@@ -235,7 +235,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_004',
     moduleId: 'cv-vocab',
     prompt: 'Translate the department acronym MT2E into English: "Métiers de la Transition et de l\'Efficacité Énergétiques"',
-    answers: ['energy transition and efficiency', 'energy transition and energy efficiency'],
+    answers: ['energy transition and efficiency', 'energy transition and energy efficiency', 'energy transition & efficiency'],
     explanation: 'MT2E stands for <strong>Energy Transition and Efficiency</strong>.',
     hint: 'Energy T... and E...'
   },
@@ -243,7 +243,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_005',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "IUT (Institut Universitaire de Technologie)"',
-    answers: ['university institute of technology'],
+    answers: ['university institute of technology', 'institute of technology'],
     explanation: 'IUT translates to <strong>University Institute of Technology</strong>.',
     hint: '3 words: University I... of T...'
   },
@@ -251,7 +251,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_006',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Stage" (in a company)',
-    answers: ['internship', 'work placement'],
+    answers: ['internship', 'work placement', 'an internship', 'intern'],
     explanation: '<strong>Internship</strong> (US) or <strong>work placement</strong> (UK) is the professional translation.',
     hint: 'Starts with I (10 letters)'
   },
@@ -259,7 +259,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_007',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Stage rémunéré"',
-    answers: ['paid internship', 'paid work placement'],
+    answers: ['paid internship', 'paid work placement', 'paid stage'],
     explanation: 'A remunerated stage is a <strong>paid internship</strong>.',
     hint: 'paid i...'
   },
@@ -267,7 +267,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_008',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Temps partiel" (as in part-time work)',
-    answers: ['part-time', 'part time'],
+    answers: ['part-time', 'part time', 'part-time job', 'part time job', 'part-time work', 'part time work'],
     explanation: '<strong>Part-time</strong> is opposed to full-time.',
     hint: 'Opposite of full-time'
   },
@@ -275,7 +275,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_009',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Bénévolat"',
-    answers: ['volunteering', 'voluntary work'],
+    answers: ['volunteering', 'voluntary work', 'volunteer work', 'volunteer'],
     explanation: '<strong>Volunteering</strong> or <strong>voluntary work</strong> is the standard CV term.',
     hint: 'Starts with V (12 letters)'
   },
@@ -283,7 +283,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_010',
     moduleId: 'cv-vocab',
     prompt: 'Complete the IT skills expression for "Avoir les bases / des notions de": "To have a ________ knowledge of Python."',
-    answers: ['working'],
+    answers: ['working', 'working knowledge', 'working knowledge of'],
     explanation: 'In CV terminology, "avoir les bases" translates to having a <strong>working knowledge of</strong>.',
     hint: 'Starts with W (7 letters)'
   },
@@ -291,7 +291,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_011',
     moduleId: 'cv-vocab',
     prompt: 'Complete the IT skills expression for "Très bien maîtriser": "To be ________ with AutoCAD."',
-    answers: ['proficient'],
+    answers: ['proficient', 'proficient with', 'proficient in'],
     explanation: 'To express advanced mastery on a CV, use <strong>proficient with</strong> (or in).',
     hint: 'Starts with P (10 letters)'
   },
@@ -299,7 +299,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_012',
     moduleId: 'cv-vocab',
     prompt: 'Translate into English: "Langue maternelle"',
-    answers: ['mother tongue', 'native speaker', 'native language'],
+    answers: ['mother tongue', 'native speaker', 'native language', 'first language'],
     explanation: '<strong>Mother tongue</strong> or <strong>native speaker</strong> is used for your first language.',
     hint: 'M... tongue'
   },
@@ -307,7 +307,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_013',
     moduleId: 'cv-vocab',
     prompt: 'Which key soft skill is typically demonstrated by playing team sports (rugby, football, basketball)?',
-    answers: ['leadership', 'teamwork', 'interpersonal skills', 'communication'],
+    answers: ['leadership', 'teamwork', 'interpersonal skills', 'communication', 'team player', 'team work'],
     explanation: 'Team sports demonstrate <strong>leadership</strong>, <strong>teamwork</strong>, or <strong>interpersonal skills</strong>.',
     hint: 'Think of leading a group or working in a team'
   },
@@ -315,7 +315,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_014',
     moduleId: 'cv-vocab',
     prompt: 'Which key soft skill is demonstrated by practicing individual endurance sports (running, swimming, cycling)?',
-    answers: ['determination', 'self-motivation', 'discipline', 'resilience'],
+    answers: ['determination', 'self-motivation', 'discipline', 'resilience', 'self motivation', 'motivation'],
     explanation: 'Individual sports highlight <strong>determination</strong>, <strong>self-motivation</strong>, and <strong>discipline</strong>.',
     hint: 'Starts with D (determination) or S (self-motivation)'
   },
@@ -323,7 +323,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_015',
     moduleId: 'cv-vocab',
     prompt: 'Which soft skill is demonstrated by travelling abroad to different cultures?',
-    answers: ['intercultural awareness', 'adaptability', 'open-mindedness', 'language skills'],
+    answers: ['intercultural awareness', 'adaptability', 'open-mindedness', 'language skills', 'cultural awareness'],
     explanation: 'Travelling shows <strong>intercultural awareness</strong>, <strong>adaptability</strong>, and openness to others.',
     hint: 'Intercultural a...'
   },
@@ -331,7 +331,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_016',
     moduleId: 'cv-vocab',
     prompt: 'Which skill is demonstrated by playing mind sports and strategy games (chess, puzzles)?',
-    answers: ['analytical skills', 'intelligence', 'strategic thinking', 'problem-solving'],
+    answers: ['analytical skills', 'intelligence', 'strategic thinking', 'problem-solving', 'analytical', 'problem solving'],
     explanation: 'Mind sports develop <strong>analytical skills</strong>, <strong>intelligence</strong>, and strategic thinking.',
     hint: 'A... skills'
   },
@@ -339,7 +339,7 @@ export const EXAM_QUESTIONS = [
     id: 'cv_017',
     moduleId: 'cv-vocab',
     prompt: 'Which skill is demonstrated by artistic interests (photography, theater, painting)?',
-    answers: ['creativity', 'resourcefulness', 'creativity / resourcefulness'],
+    answers: ['creativity', 'resourcefulness', 'creativity / resourcefulness', 'creative'],
     explanation: 'Artistic hobbies show <strong>creativity</strong> and <strong>resourcefulness</strong>.',
     hint: 'Starts with C (10 letters)'
   },
@@ -535,7 +535,9 @@ export const EXAM_QUESTIONS = [
       'it is unprofessional',
       'unprofessional email',
       'unprofessional',
-      'not professional'
+      'not professional',
+      'unprofessional address',
+      'informal'
     ],
     explanation: 'Email addresses on a CV must be professional (e.g., firstname.lastname@email.com), avoiding nicknames and party references.',
     hint: 'One word: unp...'
@@ -544,7 +546,7 @@ export const EXAM_QUESTIONS = [
     id: 'wr_002',
     moduleId: 'cv-writing',
     prompt: 'Instead of weak descriptions like "did stuff with customers", what kind of strong verbs should you use on a CV? (Give the term)',
-    answers: ['action verbs', 'power verbs', 'action words'],
+    answers: ['action verbs', 'power verbs', 'action words', 'action verb', 'power verb'],
     explanation: 'You must use <strong>action verbs</strong> (or power verbs) like "managed", "coordinated", "implemented", "developed".',
     hint: 'A... verbs'
   },
@@ -552,7 +554,7 @@ export const EXAM_QUESTIONS = [
     id: 'wr_003',
     moduleId: 'cv-writing',
     prompt: 'What formal sign-off should you use at the end of a cover letter if you addressed it to a named person ("Dear Mr. Smith")?',
-    answers: ['yours sincerely', 'sincerely'],
+    answers: ['yours sincerely', 'sincerely', 'sincerely yours'],
     explanation: 'When writing to a named recipient (Dear Mr. Smith), use <strong>Yours sincerely</strong>. (If Dear Sir/Madam, use Yours faithfully).',
     hint: 'Yours s...'
   },
@@ -560,7 +562,7 @@ export const EXAM_QUESTIONS = [
     id: 'wr_004',
     moduleId: 'cv-writing',
     prompt: 'What formal sign-off should you use if you do NOT know the recipient\'s name ("Dear Sir or Madam")?',
-    answers: ['yours faithfully'],
+    answers: ['yours faithfully', 'faithfully'],
     explanation: 'When the letter begins with "Dear Sir or Madam", the traditional formal closing is <strong>Yours faithfully</strong>.',
     hint: 'Yours f...'
   },
@@ -568,15 +570,21 @@ export const EXAM_QUESTIONS = [
     id: 'wr_005',
     moduleId: 'cv-writing',
     prompt: 'Complete this standard cover letter opening sentence: "I am writing to ________ for the position of Assistant Energy Manager advertised on LinkedIn."',
-    answers: ['apply'],
-    explanation: 'The standard formal formula is <strong>to apply for</strong> a position.',
+    answers: ['apply', 'apply for', 'to apply', 'to apply for'],
+    explanation: 'The standard formal formula is <strong>to apply for</strong> a position. (Note that "for" was already placed after the blank).',
     hint: 'Verb starting with A (5 letters)'
   },
   {
     id: 'wr_006',
     moduleId: 'cv-writing',
     prompt: 'In the Education section of your CV as a 2nd year MT2E student, what is your current degree called in English?',
-    answers: ['bachelor of technology in energy transition and efficiency', 'bachelor of technology', 'but mt2e'],
+    answers: [
+      'bachelor of technology in energy transition and efficiency',
+      'bachelor of technology',
+      'bachelor in technology',
+      'but mt2e',
+      'bachelor of technology mt2e'
+    ],
     explanation: 'Your degree is the <strong>Bachelor of Technology in Energy Transition and Efficiency</strong> (BUT MT2E).',
     hint: 'Bachelor of Technology...'
   }
